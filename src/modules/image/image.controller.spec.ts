@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ImageController } from './image.controller';
 import { ImageService } from './image.service';
+import { ProviderRouterService } from '../providers/provider-router.service';
+import { UsageService } from '../usage/usage.service';
 
 describe('ImageController', () => {
   let controller: ImageController;
@@ -8,7 +10,11 @@ describe('ImageController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ImageController],
-      providers: [ImageService],
+      providers: [
+        ImageService,
+        { provide: ProviderRouterService, useValue: {} },
+        { provide: UsageService, useValue: {} },
+      ],
     }).compile();
 
     controller = module.get<ImageController>(ImageController);

@@ -64,6 +64,7 @@ export type UsageLogMinAggregateOutputType = {
   fallbackUsed: boolean | null
   errorMessage: string | null
   ipAddress: string | null
+  requestOriginUrl: string | null
   createdAt: Date | null
 }
 
@@ -87,6 +88,7 @@ export type UsageLogMaxAggregateOutputType = {
   fallbackUsed: boolean | null
   errorMessage: string | null
   ipAddress: string | null
+  requestOriginUrl: string | null
   createdAt: Date | null
 }
 
@@ -111,6 +113,7 @@ export type UsageLogCountAggregateOutputType = {
   fallbackChain: number
   errorMessage: number
   ipAddress: number
+  requestOriginUrl: number
   createdAt: number
   _all: number
 }
@@ -154,6 +157,7 @@ export type UsageLogMinAggregateInputType = {
   fallbackUsed?: true
   errorMessage?: true
   ipAddress?: true
+  requestOriginUrl?: true
   createdAt?: true
 }
 
@@ -177,6 +181,7 @@ export type UsageLogMaxAggregateInputType = {
   fallbackUsed?: true
   errorMessage?: true
   ipAddress?: true
+  requestOriginUrl?: true
   createdAt?: true
 }
 
@@ -201,6 +206,7 @@ export type UsageLogCountAggregateInputType = {
   fallbackChain?: true
   errorMessage?: true
   ipAddress?: true
+  requestOriginUrl?: true
   createdAt?: true
   _all?: true
 }
@@ -312,6 +318,7 @@ export type UsageLogGroupByOutputType = {
   fallbackChain: string[]
   errorMessage: string | null
   ipAddress: string | null
+  requestOriginUrl: string | null
   createdAt: Date
   _count: UsageLogCountAggregateOutputType | null
   _avg: UsageLogAvgAggregateOutputType | null
@@ -359,6 +366,7 @@ export type UsageLogWhereInput = {
   fallbackChain?: Prisma.StringNullableListFilter<"UsageLog">
   errorMessage?: Prisma.StringNullableFilter<"UsageLog"> | string | null
   ipAddress?: Prisma.StringNullableFilter<"UsageLog"> | string | null
+  requestOriginUrl?: Prisma.StringNullableFilter<"UsageLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"UsageLog"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   apiKey?: Prisma.XOR<Prisma.ApiKeyScalarRelationFilter, Prisma.ApiKeyWhereInput>
@@ -387,6 +395,7 @@ export type UsageLogOrderByWithRelationInput = {
   fallbackChain?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  requestOriginUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   apiKey?: Prisma.ApiKeyOrderByWithRelationInput
@@ -418,6 +427,7 @@ export type UsageLogWhereUniqueInput = Prisma.AtLeast<{
   fallbackChain?: Prisma.StringNullableListFilter<"UsageLog">
   errorMessage?: Prisma.StringNullableFilter<"UsageLog"> | string | null
   ipAddress?: Prisma.StringNullableFilter<"UsageLog"> | string | null
+  requestOriginUrl?: Prisma.StringNullableFilter<"UsageLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"UsageLog"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   apiKey?: Prisma.XOR<Prisma.ApiKeyScalarRelationFilter, Prisma.ApiKeyWhereInput>
@@ -446,6 +456,7 @@ export type UsageLogOrderByWithAggregationInput = {
   fallbackChain?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   ipAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  requestOriginUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.UsageLogCountOrderByAggregateInput
   _avg?: Prisma.UsageLogAvgOrderByAggregateInput
@@ -478,6 +489,7 @@ export type UsageLogScalarWhereWithAggregatesInput = {
   fallbackChain?: Prisma.StringNullableListFilter<"UsageLog">
   errorMessage?: Prisma.StringNullableWithAggregatesFilter<"UsageLog"> | string | null
   ipAddress?: Prisma.StringNullableWithAggregatesFilter<"UsageLog"> | string | null
+  requestOriginUrl?: Prisma.StringNullableWithAggregatesFilter<"UsageLog"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UsageLog"> | Date | string
 }
 
@@ -498,6 +510,7 @@ export type UsageLogCreateInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutUsageLogsInput
   apiKey: Prisma.ApiKeyCreateNestedOneWithoutUsageLogsInput
@@ -526,6 +539,7 @@ export type UsageLogUncheckedCreateInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
 }
 
@@ -546,6 +560,7 @@ export type UsageLogUpdateInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutUsageLogsNestedInput
   apiKey?: Prisma.ApiKeyUpdateOneRequiredWithoutUsageLogsNestedInput
@@ -574,6 +589,7 @@ export type UsageLogUncheckedUpdateInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -598,6 +614,7 @@ export type UsageLogCreateManyInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
 }
 
@@ -618,6 +635,7 @@ export type UsageLogUpdateManyMutationInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -642,6 +660,7 @@ export type UsageLogUncheckedUpdateManyInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -684,6 +703,7 @@ export type UsageLogCountOrderByAggregateInput = {
   fallbackChain?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   ipAddress?: Prisma.SortOrder
+  requestOriginUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -716,6 +736,7 @@ export type UsageLogMaxOrderByAggregateInput = {
   fallbackUsed?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   ipAddress?: Prisma.SortOrder
+  requestOriginUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -739,6 +760,7 @@ export type UsageLogMinOrderByAggregateInput = {
   fallbackUsed?: Prisma.SortOrder
   errorMessage?: Prisma.SortOrder
   ipAddress?: Prisma.SortOrder
+  requestOriginUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -949,6 +971,7 @@ export type UsageLogCreateWithoutUserInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
   apiKey: Prisma.ApiKeyCreateNestedOneWithoutUsageLogsInput
   provider: Prisma.ProviderCreateNestedOneWithoutUsageLogsInput
@@ -975,6 +998,7 @@ export type UsageLogUncheckedCreateWithoutUserInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
 }
 
@@ -1028,6 +1052,7 @@ export type UsageLogScalarWhereInput = {
   fallbackChain?: Prisma.StringNullableListFilter<"UsageLog">
   errorMessage?: Prisma.StringNullableFilter<"UsageLog"> | string | null
   ipAddress?: Prisma.StringNullableFilter<"UsageLog"> | string | null
+  requestOriginUrl?: Prisma.StringNullableFilter<"UsageLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"UsageLog"> | Date | string
 }
 
@@ -1048,6 +1073,7 @@ export type UsageLogCreateWithoutProviderInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutUsageLogsInput
   apiKey: Prisma.ApiKeyCreateNestedOneWithoutUsageLogsInput
@@ -1074,6 +1100,7 @@ export type UsageLogUncheckedCreateWithoutProviderInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
 }
 
@@ -1120,6 +1147,7 @@ export type UsageLogCreateWithoutProviderModelInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutUsageLogsInput
   apiKey: Prisma.ApiKeyCreateNestedOneWithoutUsageLogsInput
@@ -1146,6 +1174,7 @@ export type UsageLogUncheckedCreateWithoutProviderModelInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
 }
 
@@ -1192,6 +1221,7 @@ export type UsageLogCreateWithoutApiKeyInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutUsageLogsInput
   provider: Prisma.ProviderCreateNestedOneWithoutUsageLogsInput
@@ -1218,6 +1248,7 @@ export type UsageLogUncheckedCreateWithoutApiKeyInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
 }
 
@@ -1267,6 +1298,7 @@ export type UsageLogCreateManyUserInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
 }
 
@@ -1287,6 +1319,7 @@ export type UsageLogUpdateWithoutUserInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   apiKey?: Prisma.ApiKeyUpdateOneRequiredWithoutUsageLogsNestedInput
   provider?: Prisma.ProviderUpdateOneRequiredWithoutUsageLogsNestedInput
@@ -1313,6 +1346,7 @@ export type UsageLogUncheckedUpdateWithoutUserInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1336,6 +1370,7 @@ export type UsageLogUncheckedUpdateManyWithoutUserInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1359,6 +1394,7 @@ export type UsageLogCreateManyProviderInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
 }
 
@@ -1379,6 +1415,7 @@ export type UsageLogUpdateWithoutProviderInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutUsageLogsNestedInput
   apiKey?: Prisma.ApiKeyUpdateOneRequiredWithoutUsageLogsNestedInput
@@ -1405,6 +1442,7 @@ export type UsageLogUncheckedUpdateWithoutProviderInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1428,6 +1466,7 @@ export type UsageLogUncheckedUpdateManyWithoutProviderInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1451,6 +1490,7 @@ export type UsageLogCreateManyProviderModelInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
 }
 
@@ -1471,6 +1511,7 @@ export type UsageLogUpdateWithoutProviderModelInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutUsageLogsNestedInput
   apiKey?: Prisma.ApiKeyUpdateOneRequiredWithoutUsageLogsNestedInput
@@ -1497,6 +1538,7 @@ export type UsageLogUncheckedUpdateWithoutProviderModelInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1520,6 +1562,7 @@ export type UsageLogUncheckedUpdateManyWithoutProviderModelInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1543,6 +1586,7 @@ export type UsageLogCreateManyApiKeyInput = {
   fallbackChain?: Prisma.UsageLogCreatefallbackChainInput | string[]
   errorMessage?: string | null
   ipAddress?: string | null
+  requestOriginUrl?: string | null
   createdAt?: Date | string
 }
 
@@ -1563,6 +1607,7 @@ export type UsageLogUpdateWithoutApiKeyInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutUsageLogsNestedInput
   provider?: Prisma.ProviderUpdateOneRequiredWithoutUsageLogsNestedInput
@@ -1589,6 +1634,7 @@ export type UsageLogUncheckedUpdateWithoutApiKeyInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1612,6 +1658,7 @@ export type UsageLogUncheckedUpdateManyWithoutApiKeyInput = {
   fallbackChain?: Prisma.UsageLogUpdatefallbackChainInput | string[]
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ipAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestOriginUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1638,6 +1685,7 @@ export type UsageLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   fallbackChain?: boolean
   errorMessage?: boolean
   ipAddress?: boolean
+  requestOriginUrl?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   apiKey?: boolean | Prisma.ApiKeyDefaultArgs<ExtArgs>
@@ -1666,6 +1714,7 @@ export type UsageLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   fallbackChain?: boolean
   errorMessage?: boolean
   ipAddress?: boolean
+  requestOriginUrl?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   apiKey?: boolean | Prisma.ApiKeyDefaultArgs<ExtArgs>
@@ -1694,6 +1743,7 @@ export type UsageLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   fallbackChain?: boolean
   errorMessage?: boolean
   ipAddress?: boolean
+  requestOriginUrl?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   apiKey?: boolean | Prisma.ApiKeyDefaultArgs<ExtArgs>
@@ -1722,10 +1772,11 @@ export type UsageLogSelectScalar = {
   fallbackChain?: boolean
   errorMessage?: boolean
   ipAddress?: boolean
+  requestOriginUrl?: boolean
   createdAt?: boolean
 }
 
-export type UsageLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "apiKeyId" | "providerId" | "providerModelId" | "modality" | "status" | "promptTokens" | "completionTokens" | "totalTokens" | "embeddingDimensions" | "estimatedCostUsd" | "latencyMs" | "requestId" | "endpointPath" | "isCached" | "fallbackUsed" | "fallbackChain" | "errorMessage" | "ipAddress" | "createdAt", ExtArgs["result"]["usageLog"]>
+export type UsageLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "apiKeyId" | "providerId" | "providerModelId" | "modality" | "status" | "promptTokens" | "completionTokens" | "totalTokens" | "embeddingDimensions" | "estimatedCostUsd" | "latencyMs" | "requestId" | "endpointPath" | "isCached" | "fallbackUsed" | "fallbackChain" | "errorMessage" | "ipAddress" | "requestOriginUrl" | "createdAt", ExtArgs["result"]["usageLog"]>
 export type UsageLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   apiKey?: boolean | Prisma.ApiKeyDefaultArgs<ExtArgs>
@@ -1774,6 +1825,7 @@ export type $UsageLogPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     fallbackChain: string[]
     errorMessage: string | null
     ipAddress: string | null
+    requestOriginUrl: string | null
     createdAt: Date
   }, ExtArgs["result"]["usageLog"]>
   composites: {}
@@ -2222,6 +2274,7 @@ export interface UsageLogFieldRefs {
   readonly fallbackChain: Prisma.FieldRef<"UsageLog", 'String[]'>
   readonly errorMessage: Prisma.FieldRef<"UsageLog", 'String'>
   readonly ipAddress: Prisma.FieldRef<"UsageLog", 'String'>
+  readonly requestOriginUrl: Prisma.FieldRef<"UsageLog", 'String'>
   readonly createdAt: Prisma.FieldRef<"UsageLog", 'DateTime'>
 }
     

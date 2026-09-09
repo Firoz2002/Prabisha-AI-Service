@@ -7,7 +7,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class AnthropicProvider implements AIProvider {
-  private client: Anthropic;
+  private client: Anthropic | null = null;
   name = ProviderName.ANTHROPIC;
 
   constructor(private prisma: PrismaService) {
@@ -40,6 +40,10 @@ export class AnthropicProvider implements AIProvider {
     const systemMessage = request.messages.find(m => m.role === 'system');
     const userMessages = request.messages.filter(m => m.role !== 'system');
     
+    if (!this.client) {
+      throw new Error('Anthropic API client is not initialized.');
+    }
+
     const response = await this.client.messages.create({
       model: request.model || 'claude-3-sonnet-20241022',
       system: systemMessage?.content,
@@ -56,7 +60,7 @@ export class AnthropicProvider implements AIProvider {
     return {
       content: response.content[0].type === 'text' ? response.content[0].text : '',
       model: response.model,
-      provider: this.name,
+      providerName: this.name,
       usage: {
         promptTokens: response.usage.input_tokens,
         completionTokens: response.usage.output_tokens,

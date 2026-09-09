@@ -1,0 +1,285 @@
+<div class="space-y-6">
+    <div class="mb-2">
+        <a href="/admin/providers" class="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-wider">
+            <i class="fas fa-arrow-left mr-1"></i> Back to Providers
+        </a>
+    </div>
+
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-white border border-slate-200 shadow-sm text-slate-700 text-xl">
+                <i class="fas {{getProviderIcon provider.name}}"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold tracking-tight text-slate-900">{{provider.displayName}} Models</h2>
+                <p class="text-sm font-mono text-slate-500 mt-0.5">{{provider.name}} Cluster Engine</p>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="showAddModelModal()" class="inline-flex items-center font-bold text-xs text-white px-4 py-2.5 rounded-lg transition-transform hover:scale-[1.01] shadow-sm" style="background-color: #111CA8;">
+                <i class="fas fa-plus mr-2"></i>Add Engine Model
+            </button>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Configured Weights</span>
+            <p class="text-2xl font-black text-slate-900 mt-1">{{stats.totalModels}}</p>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Default Core Routine</span>
+            <p class="text-xl font-bold text-emerald-600 mt-1 truncate">{{stats.defaultModel}}</p>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Max Window Depth</span>
+            <p class="text-2xl font-black text-slate-900 mt-1">{{#if (eq stats.maxContext 'N/A')}}N/A{{else}}{{formatNumber stats.maxContext}}{{/if}} <span class="text-sm text-slate-400 font-medium">tokens</span></p>
+        </div>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-400 font-bold uppercase tracking-wider">
+                        <th class="px-6 py-3.5">Model Identifier</th>
+                        <th class="px-6 py-3.5">Modality Target</th>
+                        <th class="px-6 py-3.5 text-right">Input Cost (/1K)</th>
+                        <th class="px-6 py-3.5 text-right">Output Cost (/1K)</th>
+                        <th class="px-6 py-3.5 text-right">Context Window</th>
+                        <th class="px-6 py-3.5 text-center">Status Engine</th>
+                        <th class="px-6 py-3.5 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-600 font-medium">
+                    {{#each provider.models}}
+                    <tr class="hover:bg-slate-50/50 transition-colors"
+                        data-model-id="{{id}}"
+                        data-raw-model-id="{{modelId}}"
+                        data-display-name="{{displayName}}"
+                        data-modality="{{modality}}"
+                        data-input-price="{{inputPricePer1k}}"
+                        data-output-price="{{outputPricePer1k}}"
+                        data-context-window="{{contextWindow}}"
+                        data-max-output="{{maxOutputTokens}}"
+                        data-is-default="{{isDefault}}"
+                        data-is-enabled="{{isEnabled}}">
+                        
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                {{#if isDefault}}
+                                    <i class="fas fa-star text-amber-400" title="Default Provider Model"></i>
+                                {{/if}}
+                                <div>
+                                    <div class="font-bold text-slate-900 text-sm">{{displayName}}</div>
+                                    <code class="text-[10px] text-slate-400 bg-slate-100 px-1 py-0.5 rounded mt-0.5 inline-block">{{modelId}}</code>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 bg-indigo-50 text-indigo-700 font-bold border border-indigo-100 text-[9px] uppercase tracking-wider rounded">{{modality}}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right font-mono text-slate-900">${{inputPricePer1k}}</td>
+                        <td class="px-6 py-4 text-right font-mono text-slate-900">${{outputPricePer1k}}</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="font-mono text-slate-900">{{#if contextWindow}}{{formatNumber contextWindow}}{{else}}--{{/if}}</div>
+                            <div class="text-[9px] text-slate-400 mt-0.5">Max Out: {{#if maxOutputTokens}}{{formatNumber maxOutputTokens}}{{else}}--{{/if}}</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            {{#if isEnabled}}
+                                <span class="inline-flex px-2 py-0.5 font-bold rounded uppercase text-[9px] border tracking-wider bg-emerald-50 text-emerald-700 border-emerald-200">ACTIVE</span>
+                            {{else}}
+                                <span class="inline-flex px-2 py-0.5 font-bold rounded uppercase text-[9px] border tracking-wider bg-slate-100 text-slate-500 border-slate-200">DISABLED</span>
+                            {{/if}}
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-1.5 font-bold text-sm">
+                            <button onclick="editModel(this)" class="text-slate-400 hover:text-slate-950 transition-colors"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteModel('{{id}}', '{{displayName}}')" class="text-slate-400 hover:text-rose-600 transition-colors"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="7" class="px-6 py-16 text-center text-slate-400">
+                            <i class="fas fa-microchip text-3xl text-slate-200 mb-3 block"></i>
+                            <p class="font-medium text-sm">No models registered for this provider.</p>
+                            <button onclick="showAddModelModal()" class="mt-2 text-xs font-bold underline" style="color: #111CA8;">Add the first model</button>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Modal with click-to-close background -->
+<div id="modelModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto backdrop-filter backdrop-blur-sm" onclick="closeModelModal()">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <!-- Stop click from bubbling up to the background -->
+        <div class="bg-white border border-slate-200 rounded-xl max-w-xl w-full shadow-2xl overflow-hidden text-sm my-8" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-slate-50">
+                <h3 class="text-sm font-bold text-slate-900 tracking-tight" id="modalTitle">Register Engine Model</h3>
+                <button type="button" onclick="closeModelModal()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <form id="modelForm" onsubmit="submitModel(event)" class="p-6 space-y-5">
+                <input type="hidden" id="editModelId">
+                <input type="hidden" id="providerId" value="{{provider.id}}">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Display Name *</label>
+                        <input type="text" id="displayName" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-medium text-slate-800" placeholder="e.g. GPT-4o Mini">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Strict SDK Model ID *</label>
+                        <input type="text" id="rawModelId" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-mono text-xs text-slate-800" placeholder="e.g. gpt-4o-mini-2024-07-18">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Core Modality *</label>
+                    <select id="modality" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-medium text-slate-800 bg-white">
+                        <option value="TEXT">TEXT (Chat Completions)</option>
+                        <option value="IMAGE">IMAGE (Generation)</option>
+                        <option value="EMBEDDING">EMBEDDING (Vectors)</option>
+                        <option value="VIDEO">VIDEO</option>
+                        <option value="AUDIO">AUDIO</option>
+                    </select>
+                </div>
+                
+                <div class="border-t border-slate-100 pt-4">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Dynamic Pricing (USD per 1,000 Tokens)</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Input / Prompt Price</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-mono">$</span>
+                                <input type="number" step="0.000001" min="0" id="inputPrice" value="0.00" class="w-full pl-7 pr-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-mono text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Output / Completion Price</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-mono">$</span>
+                                <input type="number" step="0.000001" min="0" id="outputPrice" value="0.00" class="w-full pl-7 pr-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-mono text-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border-t border-slate-100 pt-4">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Context Limits</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Max Context Window</label>
+                            <input type="number" id="contextWindow" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-mono text-sm" placeholder="e.g. 128000">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Max Output Tokens</label>
+                            <input type="number" id="maxOutput" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-mono text-sm" placeholder="e.g. 4096">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-100 pt-4 flex gap-6">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="isEnabled" checked class="rounded text-emerald-600 focus:ring-0"> 
+                        <span class="text-xs font-bold text-slate-700">Model is Active</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="isDefault" class="rounded text-amber-500 focus:ring-0"> 
+                        <span class="text-xs font-bold text-slate-700">Set as Primary Fallback Default</span>
+                    </label>
+                </div>
+                
+                <div class="flex gap-2 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeModelModal()" class="flex-1 font-bold text-xs border border-slate-200 py-2.5 rounded-lg hover:bg-slate-50 transition">Cancel</button>
+                    <button type="submit" class="flex-1 font-bold text-xs text-white py-2.5 rounded-lg transition shadow-sm" style="background-color: #111CA8;">Save Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showAddModelModal() {
+        document.getElementById('modalTitle').innerHTML = 'Register Engine Model';
+        document.getElementById('modelForm').reset();
+        document.getElementById('editModelId').value = '';
+        document.getElementById('modelModal').classList.remove('hidden');
+    }
+
+    function closeModelModal() { 
+        document.getElementById('modelModal').classList.add('hidden'); 
+    }
+
+    function editModel(button) {
+        const row = button.closest('tr');
+        document.getElementById('modalTitle').innerHTML = 'Edit Model Configuration';
+        document.getElementById('editModelId').value = row.dataset.modelId;
+        
+        document.getElementById('displayName').value = row.dataset.displayName;
+        document.getElementById('rawModelId').value = row.dataset.rawModelId;
+        document.getElementById('modality').value = row.dataset.modality;
+        document.getElementById('inputPrice').value = row.dataset.inputPrice;
+        document.getElementById('outputPrice').value = row.dataset.outputPrice;
+        document.getElementById('contextWindow').value = row.dataset.contextWindow || '';
+        document.getElementById('maxOutput').value = row.dataset.maxOutput || '';
+        
+        document.getElementById('isEnabled').checked = row.dataset.isEnabled === 'true';
+        document.getElementById('isDefault').checked = row.dataset.isDefault === 'true';
+        
+        document.getElementById('modelModal').classList.remove('hidden');
+    }
+
+    async function submitModel(e) {
+        e.preventDefault();
+        const modelId = document.getElementById('editModelId').value;
+        const providerId = document.getElementById('providerId').value;
+        
+        const payload = {
+            modelId: document.getElementById('rawModelId').value,
+            displayName: document.getElementById('displayName').value,
+            modality: document.getElementById('modality').value,
+            inputPricePer1k: document.getElementById('inputPrice').value,
+            outputPricePer1k: document.getElementById('outputPrice').value,
+            contextWindow: document.getElementById('contextWindow').value,
+            maxOutputTokens: document.getElementById('maxOutput').value,
+            isEnabled: document.getElementById('isEnabled').checked,
+            isDefault: document.getElementById('isDefault').checked
+        };
+
+        const url = modelId ? `/admin/api/models/${modelId}` : `/admin/api/providers/${providerId}/models`;
+        const method = modelId ? 'PUT' : 'POST';
+
+        try {
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if(!res.ok) throw new Error(await res.text());
+            
+            showToast('Model saved successfully', 'success');
+            setTimeout(() => window.location.reload(), 800);
+        } catch (err) {
+            showToast('Failed to save model context.', 'error');
+        }
+    }
+
+    async function deleteModel(id, name) {
+        if(!confirm(`Delete the routing configuration for ${name}?`)) return;
+        
+        try {
+            const res = await fetch(`/admin/api/models/${id}`, { method: 'DELETE' });
+            if(!res.ok) throw new Error('Deletion failed');
+            
+            showToast('Model purged from cluster', 'success');
+            setTimeout(() => window.location.reload(), 800);
+        } catch (err) {
+            showToast('Failed to delete model.', 'error');
+        }
+    }
+</script>

@@ -1,6 +1,6 @@
 // src/modules/admin/admin.controller.ts
 import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Render, Req, Res, Query } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AdminService } from './admin.service';
 import { AdminGuard } from './guards/admin.guard';
 import * as crypto from 'crypto';
@@ -57,6 +57,36 @@ export class AdminController {
     };
   }
 
+  @Get('providers/:id')
+  @Render('admin/provider-details')
+  async providerDetails(@Req() req: RequestWithUser, @Param('id') id: string) {
+    const provider = await this.adminService.getProvider(id);
+    
+    if (!provider) {
+      return { layout: 'layouts/main', title: 'Provider Not Found' };
+    }
+    
+    const defaultModel = provider.models.find(m => m.isDefault);
+    const maxContextModel = provider.models.length > 0 
+      ? provider.models.reduce((prev, current) => ((prev.contextWindow || 0) > (current.contextWindow || 0) ? prev : current))
+      : null;
+
+    return {
+      title: `${provider.displayName} Models - AI Gateway`,
+      pageTitle: provider.displayName,
+      pageSubtitle: 'Manage models, pricing, and context windows',
+      user: (req as any).user,
+      layout: 'layouts/main',
+      active: { providers: true },
+      provider,
+      stats: {
+        totalModels: provider.models.length,
+        defaultModel: defaultModel ? defaultModel.displayName : 'None Assigned',
+        maxContext: maxContextModel && maxContextModel.contextWindow ? maxContextModel.contextWindow : 'N/A'
+      }
+    };
+  }
+
   @Post('api/providers')
   async createProvider(@Body() data: any) {
     return this.adminService.createProvider(data);
@@ -80,7 +110,6 @@ export class AdminController {
     return this.adminService.getProvider(id);
   }
 
-  // Update the apiKeys method in AdminController
   @Get('api-keys')
   @Render('api-keys')
   async apiKeys(@Req() req: RequestWithUser) {
@@ -93,7 +122,7 @@ export class AdminController {
       title: 'API Keys - AI Gateway Admin',
       pageTitle: 'API Keys',
       pageSubtitle: 'Manage user API keys',
-      user: (req as any).user, // Pass current user to template
+      user: (req as any).user,
       layout: 'layouts/main',
       active: { apiKeys: true },
       apiKeys: apiKeys || [],
@@ -111,6 +140,33 @@ export class AdminController {
       user: (req as any).user,
       layout: 'layouts/main',
       active: { analytics: true },
+    };
+  }
+
+  @Get('usage-logs')
+  @Render('admin/usage-logs')
+  async usageLogs(@Req() req: RequestWithUser, @Query() query: any) {
+    const result = await this.adminService.getUsageLogs({
+      modality: query.modality,
+      providerId: query.providerId,
+      status: query.status,
+      from: query.from,
+      to: query.to,
+      page: Number(query.page) || 1,
+    });
+    const providers = await this.adminService.getAllProviders();
+
+    return {
+      title: 'Usage Logs - AI Gateway Admin',
+      pageTitle: 'Usage Logs',
+      pageSubtitle: 'Inspect requests, latency, tokens, and estimated cost',
+      user: (req as any).user,
+      layout: 'layouts/main',
+      active: { usageLogs: true },
+      activeUsageLogs: true,
+      ...result,
+      providers,
+      filters: query,
     };
   }
 
@@ -180,10 +236,9 @@ export class AdminController {
     return this.adminService.updateApiKey(id, data);
   }
 
-  // Update the create endpoint to handle new fields
   @Post('api/keys')
   async createApiKey(
-    @Body('userId') userId: string,
+    @Req() req: RequestWithUser,
     @Body('name') name: string,
     @Body('scopes') scopes: string[],
     @Body('expiresAt') expiresAt?: Date,
@@ -191,9 +246,10 @@ export class AdminController {
     @Body('rpdLimit') rpdLimit?: number,
     @Body('monthlyTokenLimit') monthlyTokenLimit?: number,
   ) {
+    const userId = (req as any).user?.id;
     return this.adminService.createApiKey(
-      userId, 
-      name, 
+      userId,
+      name,
       scopes as ApiKeyScope[],
       { expiresAt, rpmLimit, rpdLimit, monthlyTokenLimit }
     );

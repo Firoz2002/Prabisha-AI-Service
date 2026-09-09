@@ -3,6 +3,7 @@ import { Injectable, ForbiddenException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProviderName, ProviderStatus, ApiKeyStatus, ApiKeyScope, Modality } from 'src/generated/prisma/enums';
 import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -328,6 +329,62 @@ export class AdminService {
     };
   }
 
+  async getUsageLogs(filters: {
+    modality?: string;
+    providerId?: string;
+    status?: string;
+    from?: string;
+    to?: string;
+    page?: number;
+    limit?: number;
+  } = {}) {
+    const page = Math.max(filters.page || 1, 1);
+    const limit = Math.min(Math.max(filters.limit || 25, 1), 100);
+    const where: any = {};
+
+    if (filters.modality) where.modality = filters.modality;
+    if (filters.providerId) where.providerId = filters.providerId;
+    if (filters.status) where.status = filters.status;
+    if (filters.from || filters.to) {
+      where.createdAt = {};
+      if (filters.from) where.createdAt.gte = new Date(filters.from);
+      if (filters.to) {
+        const to = new Date(filters.to);
+        to.setDate(to.getDate() + 1);
+        where.createdAt.lt = to;
+      }
+    }
+
+    const [logs, total, aggregate] = await Promise.all([
+      this.prisma.usageLog.findMany({
+        where,
+        include: { user: true, provider: true, providerModel: true },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.usageLog.count({ where }),
+      this.prisma.usageLog.aggregate({
+        where,
+        _sum: { estimatedCostUsd: true, totalTokens: true },
+        _avg: { latencyMs: true },
+      }),
+    ]);
+
+    return {
+      logs,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+      summary: {
+        cost: aggregate._sum.estimatedCostUsd || 0,
+        tokens: aggregate._sum.totalTokens || 0,
+        latency: aggregate._avg.latencyMs || 0,
+      },
+    };
+  }
+
   async getAllProviders() {
     return this.prisma.provider.findMany({
       include: {
@@ -431,7 +488,7 @@ export class AdminService {
     }
     
     const rawKey = `ai-gateway-${crypto.randomBytes(32).toString('hex')}`;
-    const keyHash = crypto.createHash('sha256').update(rawKey).digest('hex');
+    const keyHash = await bcrypt.hash(rawKey, 10);
     const keyPrefix = rawKey.slice(0, 12);
 
     const apiKey = await this.prisma.apiKey.create({

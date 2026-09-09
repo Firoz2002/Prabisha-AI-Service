@@ -1,10 +1,9 @@
 // src/modules/chat/chat.service.ts
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import { InjectQueue } from '@nestjs/bull';
-import type { Queue } from 'bull';
 import * as CacheManager from 'cache-manager';
 import { ProviderRouterService } from '../providers/provider-router.service';
 import { ChatRequestDto } from './dto/chat-request';
+import { UsageService } from '../usage/usage.service';
 
 @Injectable()
 export class ChatService {
@@ -13,15 +12,38 @@ export class ChatService {
   constructor(
     private providerRouter: ProviderRouterService,
     @Inject('CACHE_MANAGER') private cacheManager: CacheManager.Cache,
-    @InjectQueue('usage-tracking') private usageQueue: Queue,
+    private usageService: UsageService,
   ) {}
 
-  async processChat(request: ChatRequestDto, userId: string, apiKeyId: string) {
+  async processChat(
+    request: ChatRequestDto,
+    userId: string,
+    apiKeyId: string,
+    requestOriginUrl?: string,
+  ) {
     // Check cache
     const cacheKey = this.generateCacheKey(request);
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) {
       this.logger.log('Returning cached response');
+      const cachedResponse = cached as any;
+      await this.usageService.trackUsage({
+        userId,
+        apiKeyId,
+        endpoint: '/chat',
+        requestOriginUrl,
+        modality: 'TEXT',
+        providerId: cachedResponse.providerId,
+        providerModelId: cachedResponse.providerModelId,
+        providerName: cachedResponse.providerName,
+        modelId: cachedResponse.model,
+        promptTokens: cachedResponse.usage?.promptTokens,
+        completionTokens: cachedResponse.usage?.completionTokens,
+        totalTokens: cachedResponse.usage?.totalTokens,
+        latencyMs: 0,
+        fallbackChain: cachedResponse.fallbackChain,
+        isCached: true,
+      });
       return cached;
     }
 
@@ -41,15 +63,22 @@ export class ChatService {
     // Cache response
     await this.cacheManager.set(cacheKey, response, 3600000); // Cache for 1 hour
 
-    // Queue usage tracking
-    await this.usageQueue.add('track-usage', {
+    // Usage tracking must not delay the provider response.
+    await this.usageService.trackUsage({
       userId,
       apiKeyId,
       endpoint: '/chat',
-      tokens: response.usage.totalTokens,
-      cost: this.calculateCost(response),
-      providerId: response.provider,
+      requestOriginUrl,
+      promptTokens: response.usage.promptTokens,
+      completionTokens: response.usage.completionTokens,
+      totalTokens: response.usage.totalTokens,
+      modality: 'TEXT',
+      latencyMs: response.latency,
+      providerId: response.providerId,
+      providerModelId: response.providerModelId,
+      providerName: response.providerName,
       modelId: response.model,
+      fallbackChain: response.fallbackChain,
     });
 
     return response;
@@ -65,16 +94,4 @@ export class ChatService {
     return `chat:${JSON.stringify(request.messages)}:${request.model || 'default'}`;
   }
 
-  private calculateCost(response: any): number {
-    // Simplified cost calculation
-    const rates: Record<string, number> = {
-      'gpt-3.5-turbo': 0.002,
-      'gpt-4': 0.03,
-      'claude-3-sonnet': 0.015,
-      'gemini-pro': 0.001,
-    };
-    
-    const rate = rates[response.model] || 0.001;
-    return (response.usage.totalTokens / 1000) * rate;
-  }
 }

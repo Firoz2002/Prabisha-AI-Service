@@ -2,14 +2,20 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
-import { Modality } from 'src/generated/prisma/enums';
+import { Modality, ProviderName } from 'src/generated/prisma/enums';
+import {
+  EmbeddingRequest,
+  EmbeddingResponse,
+  ImageGenerationRequest,
+  ImageGenerationResponse,
+} from '../provider.interface';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class OpenAIProvider {
   private client: OpenAI;
   private readonly logger = new Logger(OpenAIProvider.name);
-  public name = 'OPENAI';
+  public name = ProviderName.OPENAI;
 
   constructor(
     private configService: ConfigService,
@@ -39,7 +45,48 @@ export class OpenAIProvider {
   }
 
   supportsModality(modality: Modality): boolean {
-    return modality === 'TEXT' || modality === 'EMBEDDING';
+    return modality === Modality.TEXT || modality === Modality.EMBEDDING || modality === Modality.IMAGE;
+  }
+
+  async generateImage(request: ImageGenerationRequest): Promise<ImageGenerationResponse> {
+    if (!this.client) {
+      throw new Error('OpenAI API client is not initialized.');
+    }
+
+    const response = await this.client.images.generate({
+      model: request.model || 'dall-e-3',
+      prompt: request.prompt,
+      size: request.size as '256x256' | '512x512' | '1024x1024' | '1792x1024' | '1024x1792' | undefined,
+      quality: request.quality as 'standard' | 'hd' | undefined,
+      n: request.n || 1,
+    });
+
+    return {
+      images: (response.data || []).map(image => image.url || `data:image/png;base64,${image.b64_json}`),
+      provider: ProviderName.OPENAI,
+      model: request.model || 'dall-e-3',
+    };
+  }
+
+  async generateEmbeddings(request: EmbeddingRequest): Promise<EmbeddingResponse> {
+    if (!this.client) {
+      throw new Error('OpenAI API client is not initialized.');
+    }
+
+    const response = await this.client.embeddings.create({
+      model: request.model || 'text-embedding-3-small',
+      input: request.input,
+    });
+
+    return {
+      embeddings: response.data.map(item => item.embedding),
+      provider: ProviderName.OPENAI,
+      model: response.model,
+      usage: {
+        promptTokens: response.usage?.prompt_tokens || 0,
+        totalTokens: response.usage?.total_tokens || 0,
+      },
+    };
   }
 
   async chat(request: any): Promise<any> {
@@ -65,7 +112,7 @@ export class OpenAIProvider {
     return {
       content: response.choices[0].message.content || '',
       model: response.model,
-      provider: this.name,
+      providerName: this.name,
       usage: {
         promptTokens: usage.prompt_tokens,
         completionTokens: usage.completion_tokens,

@@ -47,7 +47,14 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-600 font-medium">
                     {{#each apiKeys}}
-                    <tr class="hover:bg-slate-50/50 transition-colors">
+                    <tr class="hover:bg-slate-50/50 transition-colors"
+                        data-api-key-id="{{id}}"
+                        data-api-key-name="{{name}}"
+                        data-api-key-scopes="{{#each scopes}}{{this}}{{#unless @last}},{{/unless}}{{/each}}"
+                        data-api-key-rpm-limit="{{#if rpmLimit}}{{rpmLimit}}{{else}}60{{/if}}"
+                        data-api-key-rpd-limit="{{#if rpdLimit}}{{rpdLimit}}{{else}}1000{{/if}}"
+                        data-api-key-monthly-token-limit="{{#if monthlyTokenLimit}}{{monthlyTokenLimit}}{{/if}}"
+                        data-api-key-expires-at="{{expiresAt}}">
                         <td class="px-6 py-4 font-bold text-slate-900">{{name}}</td>
                         <td class="px-6 py-4"><code class="font-mono text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/60">{{keyPrefix}}...</code></td>
                         <td class="px-6 py-4">
@@ -87,8 +94,8 @@
                             {{/if}}
                         </td>
                         <td class="px-6 py-4 text-right space-x-1.5 font-bold text-sm">
-                            <button onclick="editKey('{{id}}')" class="text-slate-400 hover:text-slate-950 transition-colors"><i class="fas fa-edit"></i></button>
-                            <button onclick="revokeKey('{{id}}', '{{name}}')" class="text-slate-400 hover:text-rose-600 transition-colors"><i class="fas fa-trash-alt"></i></button>
+                            <button onclick="editKey(this)" class="text-slate-400 hover:text-slate-950 transition-colors"><i class="fas fa-edit"></i></button>
+                            <button onclick="revokeKey(this)" class="text-slate-400 hover:text-rose-600 transition-colors"><i class="fas fa-trash-alt"></i></button>
                         </td>
                     </tr>
                     {{else}}
@@ -224,7 +231,141 @@
     }
     function closeKeyDisplayModal() {
         document.getElementById('keyDisplayModal').classList.add('hidden');
+        document.getElementById('generatedKey').textContent = '';
         location.reload();
     }
+
+    function setScopeCheckboxes(scopes) {
+        document.querySelectorAll('.scope-checkbox').forEach((checkbox) => {
+            checkbox.checked = scopes.includes(checkbox.value);
+        });
+    }
+
+    function getSelectedScopes() {
+        return Array.from(document.querySelectorAll('.scope-checkbox'))
+            .filter((checkbox) => checkbox.checked)
+            .map((checkbox) => checkbox.value);
+    }
+
+    function parseApiKeyScopes(scopesString) {
+        return scopesString ? scopesString.split(',').map((scope) => scope.trim()).filter(Boolean) : [];
+    }
+
+    async function handleCreateUpdateForm(event) {
+        event.preventDefault();
+
+        const editKeyId = document.getElementById('editKeyId').value;
+        const name = document.getElementById('keyName').value.trim();
+        const scopes = getSelectedScopes();
+        const rpmLimit = parseInt(document.getElementById('rpmLimit').value, 10) || 60;
+        const rpdLimit = parseInt(document.getElementById('rpdLimit').value, 10) || 1000;
+        const monthlyTokenLimitValue = document.getElementById('monthlyTokenLimit').value;
+        const monthlyTokenLimit = monthlyTokenLimitValue ? parseInt(monthlyTokenLimitValue, 10) : undefined;
+        const expiresAtValue = document.getElementById('expiresAt').value;
+        const expiresInValue = document.getElementById('expiresIn').value;
+        let expiresAt;
+
+        if (expiresAtValue) {
+            expiresAt = expiresAtValue;
+        } else if (expiresInValue) {
+            const days = parseInt(expiresInValue, 10);
+            if (!Number.isNaN(days) && days > 0) {
+                const date = new Date();
+                date.setDate(date.getDate() + days);
+                expiresAt = date.toISOString().slice(0, 10);
+            }
+        }
+
+        const payload = { name, scopes, rpmLimit, rpdLimit };
+        if (monthlyTokenLimit !== undefined) payload.monthlyTokenLimit = monthlyTokenLimit;
+        if (expiresAt) payload.expiresAt = expiresAt;
+
+        const url = editKeyId ? `/admin/api/keys/${editKeyId}` : '/admin/api/keys';
+        const method = editKeyId ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Unable to save API key');
+            }
+
+            if (editKeyId) {
+                showToast('API key updated successfully');
+                closeModal();
+                return location.reload();
+            }
+
+            generatedRawKey = result.rawKey || '';
+            document.getElementById('generatedKey').textContent = generatedRawKey;
+            document.getElementById('keyDisplayModal').classList.remove('hidden');
+            closeModal();
+        } catch (error) {
+            console.error(error);
+            showToast(error.message || 'Error saving API key', 'error');
+        }
+    }
+
+    function editKey(id) {
+        const row = document.querySelector(`tr[data-api-key-id="${id}"]`);
+        if (!row) {
+            return showToast('API key not found', 'error');
+        }
+
+        document.getElementById('modalTitle').innerHTML = 'Edit API Key';
+        document.getElementById('editKeyId').value = id;
+        document.getElementById('keyName').value = row.dataset.apiKeyName || '';
+        document.getElementById('rpmLimit').value = row.dataset.apiKeyRpmLimit || '60';
+        document.getElementById('rpdLimit').value = row.dataset.apiKeyRpdLimit || '1000';
+        document.getElementById('monthlyTokenLimit').value = row.dataset.apiKeyMonthlyTokenLimit || '';
+        document.getElementById('expiresAt').value = row.dataset.apiKeyExpiresAt || '';
+        document.getElementById('expiresIn').value = '';
+        setScopeCheckboxes(parseApiKeyScopes(row.dataset.apiKeyScopes || ''));
+        document.getElementById('createKeyModal').classList.remove('hidden');
+    }
+
+    async function revokeKey(button) {
+        const row = button.closest('tr');
+        const id = row?.dataset.apiKeyId;
+        const name = row?.dataset.apiKeyName;
+        if (!id) {
+            return showToast('Unable to identify API key for revocation', 'error');
+        }
+
+        if (!confirm(`Revoke API key "${name}"? This cannot be undone.`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/admin/api/keys/${id}`, { method: 'DELETE' });
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Unable to revoke API key');
+            }
+
+            showToast('API key revoked successfully');
+            location.reload();
+        } catch (error) {
+            console.error(error);
+            showToast(error.message || 'Error revoking API key', 'error');
+        }
+    }
+
+    function copyToClipboard() {
+        if (!generatedRawKey) {
+            return showToast('No API key available to copy', 'error');
+        }
+
+        navigator.clipboard.writeText(generatedRawKey);
+        showToast('API key copied to clipboard', 'success');
+    }
+
+    document.getElementById('createKeyForm').addEventListener('submit', handleCreateUpdateForm);
     // Form handles connect cleanly upstream mapping payload JSON parameters directly.
 </script>

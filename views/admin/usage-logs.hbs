@@ -1,0 +1,40 @@
+<div class="space-y-6">
+	<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+		<form method="get" action="/admin/usage-logs" class="flex flex-wrap items-end gap-3 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+			<label class="text-xs font-bold text-slate-500">Modality
+				<select name="modality" class="block mt-1 border border-slate-200 rounded-lg px-3 py-2 text-sm">
+					<option value="">All</option>
+					<option value="TEXT" {{#if (eq filters.modality 'TEXT')}}selected{{/if}}>Text</option>
+					<option value="IMAGE" {{#if (eq filters.modality 'IMAGE')}}selected{{/if}}>Image</option>
+					<option value="EMBEDDING" {{#if (eq filters.modality 'EMBEDDING')}}selected{{/if}}>Embedding</option>
+				</select>
+			</label>
+			<label class="text-xs font-bold text-slate-500">Provider
+				<select name="providerId" class="block mt-1 border border-slate-200 rounded-lg px-3 py-2 text-sm">
+					<option value="">All</option>
+					{{#each providers}}<option value="{{id}}" {{#if (eq ../filters.providerId id)}}selected{{/if}}>{{displayName}}</option>{{/each}}
+				</select>
+			</label>
+			<label class="text-xs font-bold text-slate-500">From<input type="date" name="from" value="{{filters.from}}" class="block mt-1 border border-slate-200 rounded-lg px-3 py-2 text-sm"></label>
+			<label class="text-xs font-bold text-slate-500">To<input type="date" name="to" value="{{filters.to}}" class="block mt-1 border border-slate-200 rounded-lg px-3 py-2 text-sm"></label>
+			<button class="px-4 py-2 rounded-lg text-sm font-bold text-white" style="background-color:#111CA8"><i class="fas fa-filter mr-1"></i>Filter</button>
+		</form>
+	</div>
+
+	<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+		<div class="bg-white border border-slate-200 rounded-xl p-5"><p class="text-xs font-bold text-slate-400 uppercase">Total Cost</p><p class="text-2xl font-bold text-slate-900 mt-2">${{summary.cost}}</p></div>
+		<div class="bg-white border border-slate-200 rounded-xl p-5"><p class="text-xs font-bold text-slate-400 uppercase">Total Tokens</p><p class="text-2xl font-bold text-slate-900 mt-2">{{summary.tokens}}</p></div>
+		<div class="bg-white border border-slate-200 rounded-xl p-5"><p class="text-xs font-bold text-slate-400 uppercase">Average Latency</p><p class="text-2xl font-bold text-slate-900 mt-2">{{summary.latency}} ms</p></div>
+	</div>
+
+	<div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-x-auto">
+		<table class="min-w-full text-sm">
+			<thead class="bg-slate-50 border-b border-slate-200"><tr class="text-left text-xs uppercase tracking-wide text-slate-500"><th class="px-5 py-3">Time</th><th class="px-5 py-3">Request Origin</th><th class="px-5 py-3">Request</th><th class="px-5 py-3">Provider / Model</th><th class="px-5 py-3">Tokens</th><th class="px-5 py-3">Cost</th><th class="px-5 py-3">Latency</th><th class="px-5 py-3">Status</th></tr></thead>
+			<tbody class="divide-y divide-slate-100">
+				{{#each logs}}
+				<tr class="text-slate-700"><td class="px-5 py-4 whitespace-nowrap text-xs text-slate-500">{{formatTime createdAt}}</td><td class="px-5 py-4 max-w-xs"><span class="block truncate font-medium" title="{{requestOriginUrl}}">{{#if requestOriginUrl}}{{requestOriginUrl}}{{else}}Direct API client{{/if}}</span></td><td class="px-5 py-4"><span class="font-bold">{{modality}}</span><div class="text-xs text-slate-400">{{endpointPath}}</div></td><td class="px-5 py-4"><span class="font-bold">{{provider.displayName}}</span><div class="text-xs text-slate-400">{{providerModel.modelId}}</div></td><td class="px-5 py-4">{{totalTokens}}</td><td class="px-5 py-4 font-semibold">${{estimatedCostUsd}}</td><td class="px-5 py-4">{{latencyMs}} ms</td><td class="px-5 py-4"><span class="px-2 py-1 rounded text-xs font-bold {{#if (eq status 'SUCCESS')}}bg-emerald-50 text-emerald-700{{else}}bg-rose-50 text-rose-700{{/if}}">{{status}}</span></td></tr>
+				{{else}}<tr><td colspan="8" class="px-5 py-12 text-center text-slate-400">No usage logs match these filters.</td></tr>{{/each}}
+			</tbody>
+		</table>
+	</div>
+</div>

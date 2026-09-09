@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ForbiddenException } from '@nestjs/common';
 import { VideoService } from './video.service';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
@@ -8,8 +8,8 @@ export class VideoController {
   constructor(private readonly videoService: VideoService) {}
 
   @Post()
-  create(@Body() createVideoDto: CreateVideoDto) {
-    return this.videoService.create(createVideoDto);
+  create(@Body() _createVideoDto: CreateVideoDto) {
+    throw new ForbiddenException('Video generation is currently disabled');
   }
 
   @Get()

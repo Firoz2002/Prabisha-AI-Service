@@ -1,15 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
 import { ImageService } from './image.service';
 import { CreateImageDto } from './dto/create-image.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
+import { ApiKeyGuard } from '../auth/guards/api-key.guard';
 
 @Controller('image')
+@UseGuards(ApiKeyGuard)
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}
 
   @Post()
-  create(@Body() createImageDto: CreateImageDto) {
-    return this.imageService.create(createImageDto);
+  async create(@Body() createImageDto: CreateImageDto, @Req() req: any) {
+    const requestOriginUrl = req.headers.origin || req.headers.referer;
+    return this.imageService.create(
+      createImageDto,
+      req.user.id,
+      req.user.apiKeyId,
+      requestOriginUrl,
+    );
   }
 
   @Get()

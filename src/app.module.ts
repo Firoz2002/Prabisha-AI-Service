@@ -11,16 +11,20 @@ import { ProvidersModule } from './modules/providers/providers.module';
 import { UsageModule } from './modules/usage/usage.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { DocsModule } from './modules/docs/docs.module';
+import { ImageModule } from './modules/image/image.module';
+import { EmbeddingsModule } from './modules/embeddings/embeddings.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    ThrottlerModule.forRoot([{
-      ttl: parseInt(process.env.THROTTLE_TTL || '60'),
-      limit: parseInt(process.env.THROTTLE_LIMIT || '100'),
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: parseInt(process.env.THROTTLE_TTL || '60'),
+        limit: parseInt(process.env.THROTTLE_LIMIT || '100'),
+      },
+    ]),
     CacheModule.register({
       isGlobal: true,
       ttl: 3600000, // 1 hour
@@ -35,6 +39,8 @@ import { AppService } from './app.service';
     AdminModule,
     AuthModule,
     DocsModule,
+    ImageModule,
+    EmbeddingsModule,
     ChatModule,
     ProvidersModule,
     UsageModule,
