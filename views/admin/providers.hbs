@@ -1,12 +1,12 @@
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
-            <h2 class="text-2xl font-bold tracking-tight text-slate-900">AI Cluster Model Nodes</h2>
-            <p class="text-sm text-slate-500 mt-0.5">Provision failover routines, routing priority configurations, and encryption contexts.</p>
+            <h2 class="text-2xl font-bold tracking-tight text-slate-900">AI Providers</h2>
+            <p class="text-sm text-slate-500 mt-0.5">Manage your AI provider configurations, routing priority, and API keys.</p>
         </div>
         <div class="flex gap-2">
             <button onclick="showAddProviderModal()" class="inline-flex items-center font-bold text-xs text-white px-4 py-2.5 rounded-lg transition-transform hover:scale-[1.01] shadow-sm" style="background-color: #111CA8;">
-                <i class="fas fa-plus mr-2"></i>Add Engine Provider
+                <i class="fas fa-plus mr-2"></i>Add AI Provider
             </button>
             <button onclick="refreshProviders()" class="inline-flex items-center font-bold text-xs border border-slate-200 bg-white text-slate-700 px-4 py-2.5 rounded-lg hover:bg-slate-50 transition">
                 <i class="fas fa-sync-alt mr-2"></i>Sync Registry
@@ -16,49 +16,78 @@
     
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {{#each providers}}
-        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between" id="provider-{{id}}">
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between" 
+             id="provider-{{id}}"
+             data-name="{{name}}"
+             data-display-name="{{displayName}}"
+             data-priority="{{priority}}"
+             data-base-url="{{baseUrl}}"
+             data-modalities="{{#each supportedModalities}}{{this}}{{#unless @last}},{{/unless}}{{/each}}">
             <div>
                 <div class="flex justify-between items-start mb-5">
-                    <div class="flex items-center gap-4">
+                    <a href="/admin/providers/{{id}}" class="flex items-center gap-4 hover:opacity-80 transition-opacity">
                         <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-50 border border-slate-100 text-slate-700 text-sm">
-                            <i class="fas {{getProviderIcon name}}"></i>
+                            {{#if (eq name 'OPENAI')}}
+                                <svg class="w-6 h-6 text-slate-800" fill="currentColor" viewBox="0 0 256 260" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M239.184 106.203a64.716 64.716 0 0 0-5.576-53.103C219.452 28.459 191 15.784 163.213 21.74A65.586 65.586 0 0 0 52.096 45.22a64.716 64.716 0 0 0-43.23 31.36c-14.31 24.602-11.061 55.634 8.033 76.74a64.665 64.665 0 0 0 5.525 53.102c14.174 24.65 42.644 37.324 70.446 31.36a64.72 64.72 0 0 0 48.754 21.744c28.481.025 53.714-18.361 62.414-45.481a64.767 64.767 0 0 0 43.229-31.36c14.137-24.558 10.875-55.423-8.083-76.483Zm-97.56 136.338a48.397 48.397 0 0 1-31.105-11.255l1.535-.87 51.67-29.825a8.595 8.595 0 0 0 4.247-7.367v-72.85l21.845 12.636c.218.111.37.32.409.563v60.367c-.056 26.818-21.783 48.545-48.601 48.601Zm-104.466-44.61a48.345 48.345 0 0 1-5.781-32.589l1.534.921 51.722 29.826a8.339 8.339 0 0 0 8.441 0l63.181-36.425v25.221a.87.87 0 0 1-.358.665l-52.335 30.184c-23.257 13.398-52.97 5.431-66.404-17.803ZM23.549 85.38a48.499 48.499 0 0 1 25.58-21.333v61.39a8.288 8.288 0 0 0 4.195 7.316l62.874 36.272-21.845 12.636a.819.819 0 0 1-.767 0L41.353 151.53c-23.211-13.454-31.171-43.144-17.804-66.405v.256Zm179.466 41.695-63.08-36.63L161.73 77.86a.819.819 0 0 1 .768 0l52.233 30.184a48.6 48.6 0 0 1-7.316 87.635v-61.391a8.544 8.544 0 0 0-4.4-7.213Zm21.742-32.69-1.535-.922-51.619-30.081a8.39 8.39 0 0 0-8.492 0L99.98 99.808V74.587a.716.716 0 0 1 .307-.665l52.233-30.133a48.652 48.652 0 0 1 72.236 50.391v.205ZM88.061 139.097l-21.845-12.585a.87.87 0 0 1-.41-.614V65.685a48.652 48.652 0 0 1 79.757-37.346l-1.535.87-51.67 29.825a8.595 8.595 0 0 0-4.246 7.367l-.051 72.697Zm11.868-25.58 28.138-16.217 28.188 16.218v32.434l-28.086 16.218-28.188-16.218-.052-32.434Z"/>
+                                </svg>
+                            {{else if (eq name 'ANTHROPIC')}}
+                                <svg class="w-6 h-6 text-slate-800" fill="currentColor" fill-rule="evenodd" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <title>Anthropic</title>
+                                    <path d="M13.827 3.52h3.603L24 20h-3.603l-6.57-16.48zm-7.258 0h3.767L16.906 20h-3.674l-1.343-3.461H5.017l-1.344 3.46H0L6.57 3.522zm4.132 9.959L8.453 7.687 6.205 13.48H10.7z"></path>
+                                </svg>
+                            {{else if (eq name 'GEMINI')}}
+                                <svg class="w-6 h-6" viewBox="0 0 296 298" xmlns="http://www.w3.org/2000/svg">
+                                    <mask id="a" width="296" height="298" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path fill="#3186FF" d="M141.201 4.886c2.282-6.17 11.042-6.071 13.184.148l5.985 17.37a184.004 184.004 0 0 0 111.257 113.049l19.304 6.997c6.143 2.227 6.156 10.91.02 13.155l-19.35 7.082a184.001 184.001 0 0 0-109.495 109.385l-7.573 20.629c-2.241 6.105-10.869 6.121-13.133.025l-7.908-21.296a184 184 0 0 0-109.02-108.658l-19.698-7.239c-6.102-2.243-6.118-10.867-.025-13.132l20.083-7.467A183.998 183.998 0 0 0 133.291 26.28l7.91-21.394Z"/></mask><g mask="url(#a)"><g filter="url(#b)"><ellipse cx="163" cy="149" fill="#3689FF" rx="196" ry="159"/></g><g filter="url(#c)"><ellipse cx="33.5" cy="142.5" fill="#F6C013" rx="68.5" ry="72.5"/></g><g filter="url(#d)"><ellipse cx="19.5" cy="148.5" fill="#F6C013" rx="68.5" ry="72.5"/></g><g filter="url(#e)"><path fill="#FA4340" d="M194 10.5C172 82.5 65.5 134.333 22.5 135L144-66l50 76.5Z"/></g><g filter="url(#f)"><path fill="#FA4340" d="M190.5-12.5C168.5 59.5 62 111.333 19 112L140.5-89l50 76.5Z"/></g><g filter="url(#g)"><path fill="#14BB69" d="M194.5 279.5C172.5 207.5 66 155.667 23 155l121.5 201 50-76.5Z"/></g><g filter="url(#h)"><path fill="#14BB69" d="M196.5 320.5C174.5 248.5 68 196.667 25 196l121.5 201 50-76.5Z"/></g></g><defs><filter id="b" width="464" height="390" x="-69" y="-46" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="18"/></filter><filter id="c" width="265" height="273" x="-99" y="6" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="32"/></filter><filter id="d" width="265" height="273" x="-113" y="12" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="32"/></filter><filter id="e" width="299.5" height="329" x="-41.5" y="-130" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="32"/></filter><filter id="f" width="299.5" height="329" x="-45" y="-153" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="32"/></filter><filter id="g" width="299.5" height="329" x="-41" y="91" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="32"/></filter><filter id="h" width="299.5" height="329" x="-39" y="132" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="32"/></filter></defs>
+                                </svg>
+                            {{else if (eq name 'MISTRAL')}}
+                                <svg class="w-6 h-6" viewBox="0 0 256 233" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M186.18182 0h46.54545v46.54545h-46.54545z"/><path fill="#F7D046" d="M209.45454 0h46.54545v46.54545h-46.54545z"/><path d="M0 0h46.54545v46.54545H0zM0 46.54545h46.54545V93.0909H0zM0 93.09091h46.54545v46.54545H0zM0 139.63636h46.54545v46.54545H0zM0 186.18182h46.54545v46.54545H0z"/><path fill="#F7D046" d="M23.27273 0h46.54545v46.54545H23.27273z"/><path fill="#F2A73B" d="M209.45454 46.54545h46.54545V93.0909h-46.54545zM23.27273 46.54545h46.54545V93.0909H23.27273z"/><path d="M139.63636 46.54545h46.54545V93.0909h-46.54545z"/><path fill="#F2A73B" d="M162.90909 46.54545h46.54545V93.0909h-46.54545zM69.81818 46.54545h46.54545V93.0909H69.81818z"/><path fill="#EE792F" d="M116.36364 93.09091h46.54545v46.54545h-46.54545zM162.90909 93.09091h46.54545v46.54545h-46.54545zM69.81818 93.09091h46.54545v46.54545H69.81818z"/><path d="M93.09091 139.63636h46.54545v46.54545H93.09091z"/><path fill="#EB5829" d="M116.36364 139.63636h46.54545v46.54545h-46.54545z"/><path fill="#EE792F" d="M209.45454 93.09091h46.54545v46.54545h-46.54545zM23.27273 93.09091h46.54545v46.54545H23.27273z"/><path d="M186.18182 139.63636h46.54545v46.54545h-46.54545z"/><path fill="#EB5829" d="M209.45454 139.63636h46.54545v46.54545h-46.54545z"/><path d="M186.18182 186.18182h46.54545v46.54545h-46.54545z"/><path fill="#EB5829" d="M23.27273 139.63636h46.54545v46.54545H23.27273z"/><path fill="#EA3326" d="M209.45454 186.18182h46.54545v46.54545h-46.54545zM23.27273 186.18182h46.54545v46.54545H23.27273z"/>
+                                </svg>
+                            {{else if (eq name 'COHERE')}}
+                                <svg class="w-6 h-6" viewBox="0 0 75 75" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M24.3 44.7c2 0 6-.1 11.6-2.4 6.5-2.7 19.3-7.5 28.6-12.5 6.5-3.5 9.3-8.1 9.3-14.3C73.8 7 66.9 0 58.3 0h-36C10 0 0 10 0 22.3s9.4 22.4 24.3 22.4z" style="fill-rule:evenodd;clip-rule:evenodd;fill:#39594d"/><path d="M30.4 60c0-6 3.6-11.5 9.2-13.8l11.3-4.7C62.4 36.8 75 45.2 75 57.6 75 67.2 67.2 75 57.6 75H45.3c-8.2 0-14.9-6.7-14.9-15z" style="fill-rule:evenodd;clip-rule:evenodd;fill:#d18ee2"/><path d="M12.9 47.6C5.8 47.6 0 53.4 0 60.5v1.7C0 69.2 5.8 75 12.9 75c7.1 0 12.9-5.8 12.9-12.9v-1.7c-.1-7-5.8-12.8-12.9-12.8z" style="fill:#ff7759"/>
+                                </svg>
+                            {{else}}
+                                <i class="fas {{getProviderIcon name}} text-xl"></i>
+                            {{/if}}
                         </div>
                         <div>
                             <h3 class="font-bold text-slate-900 text-base leading-none">{{displayName}}</h3>
                             <p class="text-xs font-mono text-slate-400 mt-1">{{name}}</p>
                         </div>
-                    </div>
-                    <div class="flex items-center gap-1.5">
+                    </a>
+                    <div class="flex items-center gap-1.5 z-10">
                         <span class="inline-flex px-2 py-0.5 font-bold rounded uppercase text-[9px] border tracking-wider
                             {{#if (eq status 'ACTIVE')}}bg-emerald-50 text-emerald-700 border-emerald-200{{else}}bg-slate-100 text-slate-500 border-slate-200{{/if}}">
                             {{status}}
                         </span>
-                        <button onclick="editProvider('{{id}}')" class="text-slate-400 hover:text-slate-950 transition-colors p-1 text-xs"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteProvider('{{id}}', '{{displayName}}')" class="text-slate-400 hover:text-rose-600 transition-colors p-1 text-xs"><i class="fas fa-trash-alt"></i></button>
+                        <button onclick="event.preventDefault(); editProvider('{{id}}')" class="text-slate-400 hover:text-slate-950 transition-colors p-1 text-xs"><i class="fas fa-edit"></i></button>
+                        <button onclick="event.preventDefault(); deleteProvider('{{id}}', '{{displayName}}')" class="text-slate-400 hover:text-rose-600 transition-colors p-1 text-xs"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
                 
                 <div class="divide-y divide-slate-100 font-medium text-xs text-slate-600 space-y-2.5">
                     <div class="flex justify-between pt-2">
-                        <span class="text-slate-400">Failover Routing Priority</span>
-                        <span class="text-slate-900 font-bold">Tier Threshold Index: {{priority}}</span>
+                        <span class="text-slate-400">Routing Priority</span>
+                        <span class="text-slate-900 font-bold">Tier: {{priority}}</span>
                     </div>
                     <div class="flex justify-between pt-2">
-                        <span class="text-slate-400">Available Weight Snapshots</span>
+                        <span class="text-slate-400">Available Models</span>
                         <span class="text-slate-900 font-bold">{{models.length}} models</span>
                     </div>
                     <div class="flex justify-between pt-2">
-                        <span class="text-slate-400">Upstream Authorization Layer</span>
+                        <span class="text-slate-400">API Key Status</span>
                         <span>
                             {{#if encryptedKey}}
-                            <span class="text-emerald-600 font-bold flex items-center gap-1"><i class="fas fa-check-circle"></i> Token Mounted</span>
+                            <span class="text-emerald-600 font-bold flex items-center gap-1"><i class="fas fa-check-circle"></i> Key Configured</span>
                             {{else}}
-                            <span class="text-rose-600 font-bold flex items-center gap-1"><i class="fas fa-exclamation-triangle"></i> Dropped Secret</span>
+                            <span class="text-rose-600 font-bold flex items-center gap-1"><i class="fas fa-exclamation-triangle"></i> Missing Key</span>
                             {{/if}}
                         </span>
                     </div>
                     <div class="flex justify-between pt-2 border-none">
-                        <span class="text-slate-400">Accepted Payload Modalities</span>
+                        <span class="text-slate-400">Supported Features</span>
                         <div class="flex gap-1">
                             {{#each supportedModalities}}
                             <span class="px-1.5 py-0.5 bg-slate-100 text-slate-700 font-bold border border-slate-200 text-[10px] rounded">{{this}}</span>
@@ -70,11 +99,11 @@
             
             <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <button onclick="showApiKeyModal('{{id}}', '{{displayName}}')" class="font-bold text-xs text-white py-2.5 rounded-lg transition-transform hover:scale-[1.01]" style="background-color: #111CA8;">
-                    <i class="fas fa-key mr-1.5 text-[10px]"></i> {{#if encryptedKey}}Update Key{{else}}Mount Key{{/if}}
+                    <i class="fas fa-key mr-1.5 text-[10px]"></i> {{#if encryptedKey}}Update API Key{{else}}Set API Key{{/if}}
                 </button>
                 {{#if encryptedKey}}
                 <button onclick="testConnection('{{id}}')" class="font-bold text-xs border border-slate-200 text-slate-700 bg-slate-50 py-2.5 rounded-lg hover:bg-slate-100 transition">
-                    <i class="fas fa-plug mr-1.5 text-[10px]"></i> Test Ping
+                    <i class="fas fa-plug mr-1.5 text-[10px]"></i> Test Connection
                 </button>
                 {{/if}}
             </div>
@@ -82,82 +111,93 @@
         {{else}}
         <div class="col-span-full border border-dashed border-slate-200 bg-white rounded-xl py-16 text-center text-sm text-slate-400">
             <i class="fas fa-database text-3xl text-slate-200 mb-3 block"></i>
-            <p class="font-medium">No external hardware abstraction loops configured inside operational configurations datasets.</p>
-            <button onclick="showAddProviderModal()" class="mt-2 text-xs font-bold underline" style="color: #111CA8;">Inject initial proxy node vector</button>
+            <p class="font-medium">No AI providers have been configured yet.</p>
+            <button onclick="showAddProviderModal()" class="mt-2 text-xs font-bold underline" style="color: #111CA8;">Add your first provider</button>
         </div>
         {{/each}}
     </div>
 </div>
 
-<div id="providerModal" class="fixed inset-0 bg-slate-950/40 hidden z-50 flex items-center justify-center backdrop-blur-sm">
-    <div class="bg-white border border-slate-200 rounded-xl max-w-md w-full shadow-2xl overflow-hidden text-sm">
+<!-- Modal Background overlay (handles click to close) -->
+<div id="providerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center backdrop-filter backdrop-blur-sm" onclick="closeProviderModal()">
+    <!-- Modal Content (stops click from bubbling to background) -->
+    <div class="bg-white border border-slate-200 rounded-xl max-w-md w-full shadow-2xl overflow-hidden text-sm" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-slate-50">
-            <h3 class="text-sm font-bold text-slate-900 tracking-tight" id="providerModalTitle">Inject Target Engine</h3>
-            <button onclick="closeProviderModal()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+            <h3 class="text-sm font-bold text-slate-900 tracking-tight" id="providerModalTitle">Add AI Provider</h3>
+            <button type="button" onclick="closeProviderModal()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
         </div>
         
         <form id="providerForm" onsubmit="submitProvider(event)" class="p-6 space-y-4">
             <input type="hidden" id="editProviderId">
             
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Engine Driver Name *</label>
-                <select id="providerName" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-medium text-slate-800 bg-white">
-                    <option value="">Select Target Core Class</option>
-                    <option value="OPENAI">OpenAI Core API</option>
-                    <option value="ANTHROPIC">Anthropic Claude Loop</option>
-                    <option value="GEMINI">Google Gemini Engine Platform</option>
-                    <option value="MISTRAL">Mistral AI Distributed Hub</option>
-                    <option value="COHERE">Cohere Processing Unit</option>
-                </select>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Select Provider *</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" id="providerDropdownIcon">
+                        <i class="fas fa-robot text-slate-400 text-lg"></i>
+                    </div>
+                    <select id="providerName" onchange="updateDropdownIcon()" required class="w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-medium text-slate-800 bg-white appearance-none cursor-pointer">
+                        <option value="" disabled selected>Choose an AI Provider</option>
+                        <option value="OPENAI">OpenAI</option>
+                        <option value="ANTHROPIC">Anthropic</option>
+                        <option value="GEMINI">Google Gemini</option>
+                        <option value="MISTRAL">Mistral AI</option>
+                        <option value="COHERE">Cohere</option>
+                    </select>
+                    <!-- Custom dropdown caret -->
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <i class="fas fa-chevron-down text-slate-400 text-xs"></i>
+                    </div>
+                </div>
             </div>
             
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Interface Label Tag *</label>
-                <input type="text" id="displayName" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-medium text-slate-800" placeholder="e.g. Production Cluster Core Layer - Ultra">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Display Name *</label>
+                <input type="text" id="displayName" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-medium text-slate-800" placeholder="e.g. Production OpenAI">
             </div>
             
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Failover Priority Rank (Lower Values Precede)</label>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Routing Priority (Lower number = higher priority)</label>
                 <input type="number" id="priority" value="100" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-medium text-slate-800">
             </div>
             
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Custom Base Routing Proxy URL (Optional)</label>
-                <input type="text" id="baseUrl" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-medium font-mono text-xs text-slate-700" placeholder="Defaults to native global driver pathways">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Custom Base URL (Optional)</label>
+                <input type="text" id="baseUrl" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-medium font-mono text-xs text-slate-700" placeholder="Defaults to standard provider URL">
             </div>
             
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Permitted Payload Target Modalities</label>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Supported Features</label>
                 <div class="space-y-1.5 font-medium text-xs text-slate-700 pl-1">
-                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="TEXT" class="modality-checkbox rounded text-slate-900 focus:ring-0"> <span>Text Computations (Chat / Token Embeddings)</span></label>
-                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="IMAGE" class="modality-checkbox rounded text-slate-900 focus:ring-0"> <span>Image Generation Raster Processing</span></label>
-                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="VIDEO" class="modality-checkbox rounded text-slate-900 focus:ring-0"> <span>Asynchronous Temporal Video Matrices</span></label>
-                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="EMBEDDING" class="modality-checkbox rounded text-slate-900 focus:ring-0"> <span>Dense Vector Mappings</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="TEXT" class="modality-checkbox rounded text-slate-900 focus:ring-0"> <span>Text Generation & Chat</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="IMAGE" class="modality-checkbox rounded text-slate-900 focus:ring-0"> <span>Image Generation</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="VIDEO" class="modality-checkbox rounded text-slate-900 focus:ring-0"> <span>Video Generation</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="EMBEDDING" class="modality-checkbox rounded text-slate-900 focus:ring-0"> <span>Embeddings</span></label>
                 </div>
             </div>
             
             <div class="flex gap-2 pt-4 border-t border-slate-100">
-                <button type="button" onclick="closeProviderModal()" class="flex-1 font-bold text-xs border border-slate-200 py-2 rounded-lg hover:bg-slate-50 transition">Dismiss View</button>
-                <button type="submit" class="flex-1 font-bold text-xs text-white py-2 rounded-lg transition shadow-sm" style="background-color: #111CA8;">Commit Core Node</button>
+                <button type="button" onclick="closeProviderModal()" class="flex-1 font-bold text-xs border border-slate-200 py-2 rounded-lg hover:bg-slate-50 transition">Cancel</button>
+                <button type="submit" class="flex-1 font-bold text-xs text-white py-2 rounded-lg transition shadow-sm" style="background-color: #111CA8;">Save Provider</button>
             </div>
         </form>
     </div>
 </div>
 
-<div id="apiKeyModal" class="fixed inset-0 bg-slate-950/40 hidden z-50 flex items-center justify-center backdrop-blur-sm">
-    <div class="bg-white border border-slate-200 rounded-xl max-w-md w-full shadow-2xl p-6 text-sm">
+<div id="apiKeyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center backdrop-filter backdrop-blur-sm" onclick="closeApiKeyModal()">
+    <div class="bg-white border border-slate-200 rounded-xl max-w-md w-full shadow-2xl p-6 text-sm" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center mb-4">
-            <h3 class="text-sm font-bold text-slate-900 tracking-tight" id="modalTitle">Mount Downstream Hardware Key</h3>
-            <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+            <h3 class="text-sm font-bold text-slate-900 tracking-tight" id="apiKeyModalTitle">Set Provider API Key</h3>
+            <button type="button" onclick="closeApiKeyModal()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
         </div>
         
         <form id="apiKeyForm" onsubmit="submitApiKey(event)" class="space-y-4">
-            <input type="hidden" id="providerId">
+            <input type="hidden" id="apiKeyProviderId">
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Plain Secret String Content</label>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">API Key</label>
                 <input type="password" id="apiKeyInput" required class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-mono text-xs" placeholder="sk-...">
                 <p class="text-[10px] text-slate-400 font-medium mt-1.5 flex items-center gap-1">
-                    <i class="fas fa-lock"></i> Payload contents encrypt strictly at rest through AES-GCM primitives.
+                    <i class="fas fa-lock"></i> Your key is encrypted using AES-256 before saving to the database.
                 </p>
             </div>
             
@@ -167,32 +207,32 @@
             
             <div class="flex gap-2 pt-2">
                 <button type="button" onclick="testKeyBeforeSave()" class="flex-1 font-bold text-xs border border-amber-300 text-orange-700 bg-orange-50/50 py-2 rounded-lg hover:bg-orange-50 transition">
-                    <i class="fas fa-vial mr-1"></i> dry-run ping
+                    <i class="fas fa-vial mr-1"></i> Test Connection
                 </button>
                 <button type="submit" class="flex-1 font-bold text-xs text-white py-2 rounded-lg transition" style="background-color: #111CA8;">
-                    Mount Verified Config
+                    Save API Key
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<div id="deleteModal" class="fixed inset-0 bg-slate-950/40 hidden z-50 flex items-center justify-center backdrop-blur-sm">
-    <div class="bg-white border border-slate-200 rounded-xl max-w-sm w-full shadow-2xl p-6 text-center text-sm">
+<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center backdrop-filter backdrop-blur-sm" onclick="closeDeleteModal()">
+    <div class="bg-white border border-slate-200 rounded-xl max-w-sm w-full shadow-2xl p-6 text-center text-sm" onclick="event.stopPropagation()">
         <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-rose-100">
             <i class="fas fa-exclamation-triangle text-base"></i>
         </div>
-        <h3 class="text-base font-bold text-slate-900 mb-1">Sever Cluster Target Node?</h3>
-        <p class="text-xs text-slate-500 mb-4">Confirm permanent decoupling of <strong id="deleteProviderName" class="text-slate-900"></strong> variables context references?</p>
+        <h3 class="text-base font-bold text-slate-900 mb-1">Delete Provider?</h3>
+        <p class="text-xs text-slate-500 mb-4">Are you sure you want to delete <strong id="deleteProviderName" class="text-slate-900"></strong>? This cannot be undone.</p>
         
         <div class="flex gap-2">
-            <button onclick="closeDeleteModal()" class="flex-1 font-bold text-xs border border-slate-200 py-2.5 rounded-lg hover:bg-slate-50 transition">Abort</button>
-            <button onclick="confirmDelete()" class="flex-1 font-bold text-xs text-white bg-rose-600 py-2.5 rounded-lg hover:bg-rose-700 transition">Confirm Purge</button>
+            <button type="button" onclick="closeDeleteModal()" class="flex-1 font-bold text-xs border border-slate-200 py-2.5 rounded-lg hover:bg-slate-50 transition">Cancel</button>
+            <button type="button" onclick="confirmDelete()" class="flex-1 font-bold text-xs text-white bg-rose-600 py-2.5 rounded-lg hover:bg-rose-700 transition">Delete Provider</button>
         </div>
     </div>
 </div>
 
-<div id="loadingOverlay" class="fixed inset-0 bg-slate-950/20 hidden items-center justify-center z-[100] backdrop-blur-[1px]">
+<div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[100] backdrop-filter backdrop-blur-[1px]">
     <div class="bg-white border border-slate-200 shadow-xl rounded-xl px-5 py-3.5 flex items-center gap-3 text-xs font-semibold text-slate-700">
         <div class="animate-spin rounded-full h-4 w-4 border-2 border-slate-300" style="border-top-color: #111CA8;"></div>
         <span>Evaluating cluster dependencies...</span>
@@ -203,32 +243,207 @@
     let currentProviderId = null;
     let deleteProviderId = null;
 
+    const providerIcons = {
+        'OPENAI': `<svg class="w-5 h-5 text-slate-800" fill="currentColor" viewBox="0 0 256 260" xmlns="http://www.w3.org/2000/svg"><path d="M239.184 106.203a64.716 64.716 0 0 0-5.576-53.103C219.452 28.459 191 15.784 163.213 21.74A65.586 65.586 0 0 0 52.096 45.22a64.716 64.716 0 0 0-43.23 31.36c-14.31 24.602-11.061 55.634 8.033 76.74a64.665 64.665 0 0 0 5.525 53.102c14.174 24.65 42.644 37.324 70.446 31.36a64.72 64.72 0 0 0 48.754 21.744c28.481.025 53.714-18.361 62.414-45.481a64.767 64.767 0 0 0 43.229-31.36c14.137-24.558 10.875-55.423-8.083-76.483Zm-97.56 136.338a48.397 48.397 0 0 1-31.105-11.255l1.535-.87 51.67-29.825a8.595 8.595 0 0 0 4.247-7.367v-72.85l21.845 12.636c.218.111.37.32.409.563v60.367c-.056 26.818-21.783 48.545-48.601 48.601Zm-104.466-44.61a48.345 48.345 0 0 1-5.781-32.589l1.534.921 51.722 29.826a8.339 8.339 0 0 0 8.441 0l63.181-36.425v25.221a.87.87 0 0 1-.358.665l-52.335 30.184c-23.257 13.398-52.97 5.431-66.404-17.803ZM23.549 85.38a48.499 48.499 0 0 1 25.58-21.333v61.39a8.288 8.288 0 0 0 4.195 7.316l62.874 36.272-21.845 12.636a.819.819 0 0 1-.767 0L41.353 151.53c-23.211-13.454-31.171-43.144-17.804-66.405v.256Zm179.466 41.695-63.08-36.63L161.73 77.86a.819.819 0 0 1 .768 0l52.233 30.184a48.6 48.6 0 0 1-7.316 87.635v-61.391a8.544 8.544 0 0 0-4.4-7.213Zm21.742-32.69-1.535-.922-51.619-30.081a8.39 8.39 0 0 0-8.492 0L99.98 99.808V74.587a.716.716 0 0 1 .307-.665l52.233-30.133a48.652 48.652 0 0 1 72.236 50.391v.205ZM88.061 139.097l-21.845-12.585a.87.87 0 0 1-.41-.614V65.685a48.652 48.652 0 0 1 79.757-37.346l-1.535.87-51.67 29.825a8.595 8.595 0 0 0-4.246 7.367l-.051 72.697Zm11.868-25.58 28.138-16.217 28.188 16.218v32.434l-28.086 16.218-28.188-16.218-.052-32.434Z"/></svg>`,
+        'ANTHROPIC': `<svg class="w-5 h-5 text-slate-800" fill="currentColor" fill-rule="evenodd" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13.827 3.52h3.603L24 20h-3.603l-6.57-16.48zm-7.258 0h3.767L16.906 20h-3.674l-1.343-3.461H5.017l-1.344 3.46H0L6.57 3.522zm4.132 9.959L8.453 7.687 6.205 13.48H10.7z"></path></svg>`,
+        'GEMINI': `<svg class="w-5 h-5" viewBox="0 0 296 298" xmlns="http://www.w3.org/2000/svg"><mask id="a" width="296" height="298" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path fill="#3186FF" d="M141.201 4.886c2.282-6.17 11.042-6.071 13.184.148l5.985 17.37a184.004 184.004 0 0 0 111.257 113.049l19.304 6.997c6.143 2.227 6.156 10.91.02 13.155l-19.35 7.082a184.001 184.001 0 0 0-109.495 109.385l-7.573 20.629c-2.241 6.105-10.869 6.121-13.133.025l-7.908-21.296a184 184 0 0 0-109.02-108.658l-19.698-7.239c-6.102-2.243-6.118-10.867-.025-13.132l20.083-7.467A183.998 183.998 0 0 0 133.291 26.28l7.91-21.394Z"/></mask><g mask="url(#a)"><g filter="url(#b)"><ellipse cx="163" cy="149" fill="#3689FF" rx="196" ry="159"/></g><g filter="url(#c)"><ellipse cx="33.5" cy="142.5" fill="#F6C013" rx="68.5" ry="72.5"/></g><g filter="url(#d)"><ellipse cx="19.5" cy="148.5" fill="#F6C013" rx="68.5" ry="72.5"/></g><g filter="url(#e)"><path fill="#FA4340" d="M194 10.5C172 82.5 65.5 134.333 22.5 135L144-66l50 76.5Z"/></g><g filter="url(#f)"><path fill="#FA4340" d="M190.5-12.5C168.5 59.5 62 111.333 19 112L140.5-89l50 76.5Z"/></g><g filter="url(#g)"><path fill="#14BB69" d="M194.5 279.5C172.5 207.5 66 155.667 23 155l121.5 201 50-76.5Z"/></g><g filter="url(#h)"><path fill="#14BB69" d="M196.5 320.5C174.5 248.5 68 196.667 25 196l121.5 201 50-76.5Z"/></g></g><defs><filter id="b" width="464" height="390" x="-69" y="-46" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="18"/></filter><filter id="c" width="265" height="273" x="-99" y="6" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="32"/></filter><filter id="d" width="265" height="273" x="-113" y="12" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="32"/></filter><filter id="e" width="299.5" height="329" x="-41.5" y="-130" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="32"/></filter><filter id="f" width="299.5" height="329" x="-45" y="-153" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="32"/></filter><filter id="g" width="299.5" height="329" x="-41" y="91" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="32"/></filter><filter id="h" width="299.5" height="329" x="-39" y="132" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_69_17998" stdDeviation="32"/></filter></defs></svg>`,
+        'MISTRAL': `<svg class="w-5 h-5" viewBox="0 0 256 233" xmlns="http://www.w3.org/2000/svg"><path d="M186.18182 0h46.54545v46.54545h-46.54545z"/><path fill="#F7D046" d="M209.45454 0h46.54545v46.54545h-46.54545z"/><path d="M0 0h46.54545v46.54545H0zM0 46.54545h46.54545V93.0909H0zM0 93.09091h46.54545v46.54545H0zM0 139.63636h46.54545v46.54545H0zM0 186.18182h46.54545v46.54545H0z"/><path fill="#F7D046" d="M23.27273 0h46.54545v46.54545H23.27273z"/><path fill="#F2A73B" d="M209.45454 46.54545h46.54545V93.0909h-46.54545zM23.27273 46.54545h46.54545V93.0909H23.27273z"/><path d="M139.63636 46.54545h46.54545V93.0909h-46.54545z"/><path fill="#F2A73B" d="M162.90909 46.54545h46.54545V93.0909h-46.54545zM69.81818 46.54545h46.54545V93.0909H69.81818z"/><path fill="#EE792F" d="M116.36364 93.09091h46.54545v46.54545h-46.54545zM162.90909 93.09091h46.54545v46.54545h-46.54545zM69.81818 93.09091h46.54545v46.54545H69.81818z"/><path d="M93.09091 139.63636h46.54545v46.54545H93.09091z"/><path fill="#EB5829" d="M116.36364 139.63636h46.54545v46.54545h-46.54545z"/><path fill="#EE792F" d="M209.45454 93.09091h46.54545v46.54545h-46.54545zM23.27273 93.09091h46.54545v46.54545H23.27273z"/><path d="M186.18182 139.63636h46.54545v46.54545h-46.54545z"/><path fill="#EB5829" d="M209.45454 139.63636h46.54545v46.54545h-46.54545z"/><path d="M186.18182 186.18182h46.54545v46.54545h-46.54545z"/><path fill="#EB5829" d="M23.27273 139.63636h46.54545v46.54545H23.27273z"/><path fill="#EA3326" d="M209.45454 186.18182h46.54545v46.54545h-46.54545zM23.27273 186.18182h46.54545v46.54545H23.27273z"/></svg>`,
+        'COHERE': `<svg class="w-5 h-5" viewBox="0 0 75 75" xmlns="http://www.w3.org/2000/svg"><path d="M24.3 44.7c2 0 6-.1 11.6-2.4 6.5-2.7 19.3-7.5 28.6-12.5 6.5-3.5 9.3-8.1 9.3-14.3C73.8 7 66.9 0 58.3 0h-36C10 0 0 10 0 22.3s9.4 22.4 24.3 22.4z" style="fill-rule:evenodd;clip-rule:evenodd;fill:#39594d"/><path d="M30.4 60c0-6 3.6-11.5 9.2-13.8l11.3-4.7C62.4 36.8 75 45.2 75 57.6 75 67.2 67.2 75 57.6 75H45.3c-8.2 0-14.9-6.7-14.9-15z" style="fill-rule:evenodd;clip-rule:evenodd;fill:#d18ee2"/><path d="M12.9 47.6C5.8 47.6 0 53.4 0 60.5v1.7C0 69.2 5.8 75 12.9 75c7.1 0 12.9-5.8 12.9-12.9v-1.7c-.1-7-5.8-12.8-12.9-12.8z" style="fill:#ff7759"/></svg>`,
+        'default': `<i class="fas fa-robot text-slate-400 text-lg"></i>`
+    };
+
+    function updateDropdownIcon() {
+        const select = document.getElementById('providerName');
+        const iconContainer = document.getElementById('providerDropdownIcon');
+        const selectedValue = select.value;
+        iconContainer.innerHTML = providerIcons[selectedValue] || providerIcons['default'];
+    }
+
     function refreshProviders() { location.reload(); }
+    
     function showAddProviderModal() {
-        document.getElementById('providerModalTitle').innerHTML = 'Inject Target Engine Node';
+        document.getElementById('providerModalTitle').innerHTML = 'Add AI Provider';
         document.getElementById('providerForm').reset();
         document.getElementById('editProviderId').value = '';
+        updateDropdownIcon();
+        
+        document.querySelectorAll('.modality-checkbox').forEach(cb => cb.checked = false);
+        
         document.getElementById('providerModal').classList.remove('hidden');
     }
+    
+    function editProvider(id) {
+        const card = document.getElementById(`provider-${id}`);
+        if (!card) return;
+
+        document.getElementById('providerModalTitle').innerHTML = 'Edit AI Provider';
+        document.getElementById('editProviderId').value = id;
+        document.getElementById('providerName').value = card.dataset.name;
+        document.getElementById('displayName').value = card.dataset.displayName;
+        document.getElementById('priority').value = card.dataset.priority;
+        document.getElementById('baseUrl').value = card.dataset.baseUrl || '';
+
+        const modalities = card.dataset.modalities ? card.dataset.modalities.split(',') : [];
+        document.querySelectorAll('.modality-checkbox').forEach(cb => {
+            cb.checked = modalities.includes(cb.value);
+        });
+
+        updateDropdownIcon();
+        document.getElementById('providerModal').classList.remove('hidden');
+    }
+
+    async function submitProvider(e) {
+        e.preventDefault();
+        const id = document.getElementById('editProviderId').value;
+        
+        const checkboxes = document.querySelectorAll('.modality-checkbox:checked');
+        const supportedModalities = Array.from(checkboxes).map(cb => cb.value);
+
+        const payload = {
+            name: document.getElementById('providerName').value,
+            displayName: document.getElementById('displayName').value,
+            priority: parseInt(document.getElementById('priority').value, 10),
+            baseUrl: document.getElementById('baseUrl').value,
+            supportedModalities
+        };
+
+        const url = id ? `/admin/api/providers/${id}` : `/admin/api/providers`;
+        const method = id ? 'PUT' : 'POST';
+
+        try {
+            showLoading();
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if(!res.ok) throw new Error(await res.text());
+            
+            showToast(id ? 'Provider updated successfully' : 'Provider added successfully', 'success');
+            setTimeout(() => window.location.reload(), 800);
+        } catch (err) {
+            hideLoading();
+            showToast('Failed to save provider context.', 'error');
+        }
+    }
+    
     function closeProviderModal() { document.getElementById('providerModal').classList.add('hidden'); }
+    
+    function deleteProvider(id, name) {
+        deleteProviderId = id;
+        document.getElementById('deleteProviderName').textContent = name;
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    async function confirmDelete() {
+        if(!deleteProviderId) return;
+        try {
+            showLoading();
+            const res = await fetch(`/admin/api/providers/${deleteProviderId}`, { method: 'DELETE' });
+            
+            if(!res.ok) throw new Error(await res.text());
+            
+            showToast('Provider purged from cluster', 'success');
+            setTimeout(() => window.location.reload(), 800);
+        } catch(err) {
+            hideLoading();
+            closeDeleteModal();
+            showToast('Failed to delete provider (Ensure all usage logs are cleared first)', 'error');
+        }
+    }
+
     function closeDeleteModal() {
         document.getElementById('deleteModal').classList.add('hidden');
         deleteProviderId = null;
     }
+    
     function showApiKeyModal(providerId, providerName) {
         currentProviderId = providerId;
-        document.getElementById('modalTitle').innerHTML = `Mount Cryptographic Secret — ${providerName}`;
-        document.getElementById('providerId').value = providerId;
+        document.getElementById('apiKeyModalTitle').innerHTML = `Set API Key — ${providerName}`;
+        document.getElementById('apiKeyProviderId').value = providerId;
         document.getElementById('apiKeyInput').value = '';
         document.getElementById('testResult').style.display = 'none';
         document.getElementById('apiKeyModal').classList.remove('hidden');
     }
+
+    async function submitApiKey(e) {
+        e.preventDefault();
+        const id = document.getElementById('apiKeyProviderId').value;
+        const apiKey = document.getElementById('apiKeyInput').value;
+        
+        try {
+            showLoading();
+            const res = await fetch(`/admin/api/providers/${id}/key`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ apiKey })
+            });
+            
+            if(!res.ok) throw new Error('Failed to save key structure');
+            
+            showToast('API Key encrypted and mounted successfully', 'success');
+            setTimeout(() => window.location.reload(), 800);
+        } catch (err) {
+            hideLoading();
+            showToast(err.message, 'error');
+        }
+    }
+
+    async function testKeyBeforeSave() {
+        const id = document.getElementById('apiKeyProviderId').value;
+        const apiKey = document.getElementById('apiKeyInput').value;
+        const resultDiv = document.getElementById('testResult');
+        const messageDiv = document.getElementById('testMessage');
+        
+        resultDiv.style.display = 'block';
+        messageDiv.className = 'text-xs p-2.5 rounded border font-semibold bg-slate-100 text-slate-600 border-slate-200';
+        messageDiv.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Pinging provider endpoint...';
+
+        try {
+            const res = await fetch(`/admin/api/providers/${id}/test`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ apiKey })
+            });
+            const data = await res.json();
+            
+            if(data.success) {
+                messageDiv.className = 'text-xs p-2.5 rounded border font-semibold bg-emerald-50 text-emerald-700 border-emerald-200';
+                messageDiv.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${data.message}`;
+            } else {
+                messageDiv.className = 'text-xs p-2.5 rounded border font-semibold bg-rose-50 text-rose-700 border-rose-200';
+                messageDiv.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i>${data.message}`;
+            }
+        } catch (err) {
+            messageDiv.className = 'text-xs p-2.5 rounded border font-semibold bg-rose-50 text-rose-700 border-rose-200';
+            messageDiv.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i>Connection routing failed`;
+        }
+    }
+
+    async function testConnection(id) {
+        try {
+            showLoading();
+            const res = await fetch(`/admin/api/providers/${id}/test`, { method: 'POST' });
+            const data = await res.json();
+            hideLoading();
+            
+            if(data.success) {
+                showToast(data.message, 'success');
+            } else {
+                showToast(data.message, 'error');
+            }
+        } catch (err) {
+            hideLoading();
+            showToast('Live connection test dropped', 'error');
+        }
+    }
+    
     function closeApiKeyModal() {
         document.getElementById('apiKeyModal').classList.add('hidden');
         currentProviderId = null;
     }
+    
     function showLoading() { document.getElementById('loadingOverlay').classList.remove('hidden'); }
     function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
-    
-    // Core logic tracking maps continue to flow dynamically into standard context layouts safely.
 </script>

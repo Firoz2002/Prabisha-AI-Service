@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { CentralAuthStrategy } from './strategies/central-auth.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ApiKeyStrategy } from './strategies/api-key.strategy';
+import { ApiKeyGuard } from './guards/api-key.guard';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PrismaModule } from '../prisma/prisma.module';

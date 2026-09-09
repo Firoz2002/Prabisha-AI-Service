@@ -316,12 +316,12 @@ export type ProviderModelOrderByWithRelationInput = {
 
 export type ProviderModelWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  modelId?: string
   providerId_modelId?: Prisma.ProviderModelProviderIdModelIdCompoundUniqueInput
   AND?: Prisma.ProviderModelWhereInput | Prisma.ProviderModelWhereInput[]
   OR?: Prisma.ProviderModelWhereInput[]
   NOT?: Prisma.ProviderModelWhereInput | Prisma.ProviderModelWhereInput[]
   providerId?: Prisma.StringFilter<"ProviderModel"> | string
-  modelId?: Prisma.StringFilter<"ProviderModel"> | string
   displayName?: Prisma.StringFilter<"ProviderModel"> | string
   modality?: Prisma.EnumModalityFilter<"ProviderModel"> | $Enums.Modality
   isDefault?: Prisma.BoolFilter<"ProviderModel"> | boolean
@@ -334,7 +334,7 @@ export type ProviderModelWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"ProviderModel"> | Date | string
   provider?: Prisma.XOR<Prisma.ProviderScalarRelationFilter, Prisma.ProviderWhereInput>
   usageLogs?: Prisma.UsageLogListRelationFilter
-}, "id" | "providerId_modelId">
+}, "id" | "modelId" | "providerId_modelId">
 
 export type ProviderModelOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

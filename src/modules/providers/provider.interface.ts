@@ -12,17 +12,21 @@ export interface ChatRequest {
 export interface ChatResponse {
   content: string;
   model: string;
-  provider: ProviderName;
+  providerName: ProviderName;
+  providerId?: string;
+  providerModelId?: string;
   usage: {
     promptTokens: number;
     completionTokens: number;
     totalTokens: number;
   };
   latency: number;
+  fallbackChain?: string[];
 }
 
 export interface ImageGenerationRequest {
   prompt: string;
+  model?: string;
   size?: string;
   quality?: string;
   n?: number;
@@ -32,6 +36,9 @@ export interface ImageGenerationResponse {
   images: string[];
   provider: ProviderName;
   model: string;
+  providerId?: string;
+  providerModelId?: string;
+  latency?: number;
 }
 
 export interface VideoGenerationRequest {
@@ -59,6 +66,9 @@ export interface EmbeddingResponse {
     promptTokens: number;
     totalTokens: number;
   };
+  providerId?: string;
+  providerModelId?: string;
+  latency?: number;
 }
 
 export interface AIProvider {

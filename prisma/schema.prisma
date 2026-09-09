@@ -133,7 +133,7 @@ model Provider {
 model ProviderModel {
   id          String       @id @default(cuid())
   providerId  String
-  modelId     String       @db.VarChar(150)  // e.g. "gpt-4o", "claude-sonnet-4-5"
+  modelId     String       @db.VarChar(150) @unique // e.g. "gpt-4o", "claude-sonnet-4-5"
   displayName String       @db.VarChar(150)
   modality    Modality
   isDefault   Boolean      @default(false)
@@ -227,6 +227,7 @@ model UsageLog {
   fallbackChain   String[] // provider names tried before success
   errorMessage    String?  @db.Text
   ipAddress       String?  @db.VarChar(45)          // IPv4 or IPv6
+  requestOriginUrl String?  @db.VarChar(500)        // e.g. "https://myapp.com/chat"
 
   createdAt       DateTime @default(now())
 

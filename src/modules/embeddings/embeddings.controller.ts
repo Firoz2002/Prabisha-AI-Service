@@ -1,15 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
 import { EmbeddingsService } from './embeddings.service';
 import { CreateEmbeddingDto } from './dto/create-embedding.dto';
 import { UpdateEmbeddingDto } from './dto/update-embedding.dto';
+import { ApiKeyGuard } from '../auth/guards/api-key.guard';
 
 @Controller('embeddings')
+@UseGuards(ApiKeyGuard)
 export class EmbeddingsController {
   constructor(private readonly embeddingsService: EmbeddingsService) {}
 
   @Post()
-  create(@Body() createEmbeddingDto: CreateEmbeddingDto) {
-    return this.embeddingsService.create(createEmbeddingDto);
+  create(@Body() createEmbeddingDto: CreateEmbeddingDto, @Req() req: any) {
+    const requestOriginUrl = req.headers.origin || req.headers.referer;
+    return this.embeddingsService.create(
+      createEmbeddingDto,
+      req.user.id,
+      req.user.apiKeyId,
+      requestOriginUrl,
+    );
   }
 
   @Get()

@@ -1,7 +1,7 @@
 // src/modules/auth/guards/api-key.guard.ts
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
@@ -15,23 +15,40 @@ export class ApiKeyGuard implements CanActivate {
       throw new UnauthorizedException('API key is required');
     }
 
-    // Hash the incoming key for comparison
-    const hashedKey = crypto.createHash('sha256').update(apiKey).digest('hex');
+    // 1. Extract the prefix (first 12 chars) to match your admin.service.ts logic
+    const incomingPrefix = apiKey.slice(0, 12);
 
-    const apiKeyRecord = await this.prisma.apiKey.findFirst({
+    // 2. Fetch all active keys that match this prefix
+    // (This includes the fix for keys with infinite lifespans / expiresAt: null)
+    const potentialKeys = await this.prisma.apiKey.findMany({
       where: {
-        keyHash: hashedKey,
+        keyPrefix: incomingPrefix,
         status: 'ACTIVE',
-        expiresAt: { gt: new Date() },
+        OR: [
+          { expiresAt: null },
+          { expiresAt: { gt: new Date() } },
+        ],
       },
       include: { user: true },
     });
+
+    // 3. Initialize with 'any' to satisfy TypeScript strict null checks
+    let apiKeyRecord: any = null;
+
+    // 4. Use bcrypt to compare the incoming raw key against the stored hashes
+    for (const key of potentialKeys) {
+      const isMatch = await bcrypt.compare(apiKey, key.keyHash);
+      if (isMatch) {
+        apiKeyRecord = key;
+        break;
+      }
+    }
 
     if (!apiKeyRecord) {
       throw new UnauthorizedException('Invalid or expired API key');
     }
 
-    // Update last used timestamp
+    // 5. Update last used timestamp and usage count
     await this.prisma.apiKey.update({
       where: { id: apiKeyRecord.id },
       data: { 
@@ -40,7 +57,7 @@ export class ApiKeyGuard implements CanActivate {
       },
     });
 
-    // Attach user and apiKey info to request
+    // 6. Attach user and apiKey info to request
     request.user = {
       id: apiKeyRecord.user.id,
       email: apiKeyRecord.user.email,

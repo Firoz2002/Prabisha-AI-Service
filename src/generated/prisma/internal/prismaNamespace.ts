@@ -992,6 +992,7 @@ export const UsageLogScalarFieldEnum = {
   fallbackChain: 'fallbackChain',
   errorMessage: 'errorMessage',
   ipAddress: 'ipAddress',
+  requestOriginUrl: 'requestOriginUrl',
   createdAt: 'createdAt'
 } as const
 

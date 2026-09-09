@@ -12,55 +12,72 @@ export class UsageProcessor {
 
   @Process('track-usage')
   async handleUsageTracking(job: Job) {
-    const { userId, apiKeyId, endpoint, tokens, cost, providerId, modelId } = job.data;
-    
+    const {
+      userId,
+      apiKeyId,
+      endpoint,
+      promptTokens,
+      completionTokens,
+      tokens,
+      cost,
+      latencyMs,
+      providerId,
+      providerModelId,
+      fallbackChain,
+      modality,
+      imageCount,
+      isCached,
+      requestOriginUrl,
+    } = job.data;
+
     try {
-      // Check if required fields exist
       if (!userId || !apiKeyId) {
         this.logger.warn('Missing required fields for usage tracking');
         return;
       }
 
-      // Find or get provider and model IDs
-      let finalProviderId = providerId;
-      let finalModelId = modelId;
+      const finalFallbackChain = fallbackChain || [];
 
-      if (!finalProviderId) {
-        const defaultProvider = await this.prisma.provider.findFirst({
-          where: { isEnabled: true },
-        });
-        if (defaultProvider) {
-          finalProviderId = defaultProvider.id;
-          
-          const defaultModel = await this.prisma.providerModel.findFirst({
-            where: { providerId: defaultProvider.id },
-          });
-          if (defaultModel) {
-            finalModelId = defaultModel.id;
-          }
-        }
+      if (!providerId || !providerModelId) {
+        throw new Error('Provider and provider model are required for usage logging');
       }
+
+      const providerModel = await this.prisma.providerModel.findUnique({
+        where: { id: providerModelId },
+      });
+      if (!providerModel) throw new Error('Provider model not found for usage logging');
+
+      const inputUnits = promptTokens ?? 0;
+      const outputUnits = completionTokens ?? 0;
+      const tokenCost = (inputUnits / 1000) * providerModel.inputPricePer1k
+        + (outputUnits / 1000) * providerModel.outputPricePer1k;
+      const cost = modality === 'IMAGE'
+        ? (imageCount ?? 0) * providerModel.outputPricePer1k
+        : tokenCost;
 
       await this.prisma.usageLog.create({
         data: {
-          userId: userId,
-          apiKeyId: apiKeyId,
-          providerId: finalProviderId || '',
-          providerModelId: finalModelId || '',
-          modality: 'TEXT',
-          status: 'SUCCESS',
-          endpointPath: endpoint || '/api/chat',
-          totalTokens: tokens || 0,
-          estimatedCostUsd: cost || 0,
-          latencyMs: 0,
+          userId,
+          apiKeyId,
+          providerId,
+          providerModelId,
+          modality: modality || 'TEXT',
+          status: job.data.status || 'SUCCESS',
+          endpointPath: endpoint || '/chat',
+          requestOriginUrl: requestOriginUrl ?? null,
+          promptTokens: promptTokens ?? null,
+          completionTokens: completionTokens ?? null,
+          totalTokens: tokens ?? 0,
+          estimatedCostUsd: cost,
+          latencyMs: latencyMs ?? 0,
           requestId: `job_${job.id}_${Date.now()}`,
-          isCached: false,
-          fallbackUsed: false,
-          fallbackChain: [],
+          isCached: isCached ?? false,
+          fallbackUsed: finalFallbackChain.length > 1,
+          fallbackChain: finalFallbackChain,
           createdAt: new Date(),
         },
       });
-      
+
       this.logger.log(`Usage tracked for user ${userId}`);
     } catch (error) {
       this.logger.error(`Failed to track usage: ${error}`);
